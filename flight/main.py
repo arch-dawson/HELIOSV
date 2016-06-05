@@ -63,10 +63,10 @@ nightMode = threading.Event()
 
 # Package arg tuples for thread
 dwnl_args = (downlink, gnd_bus)
-uplk_args = (downlink, gnd_bus, adcs_cmd, sens_cmd, inputQ, nightMode) # Implement nightMode here
+uplk_args = (downlink, gnd_bus, adcs_cmd, sens_cmd, inputQ) # Implement nightMode here
 sens_args = (downlink, i2c_bus, camera, sens_cmd)
-adcs_args = (downlink, adcs_cmd, ele, azi, motorInhibit, camera, nightMode)
-serv_args = (downlink, inputQ, nightMode)
+adcs_args = (downlink, adcs_cmd, ele, azi, motorInhibit, camera)
+serv_args = (downlink, inputQ)
 
 # Create thread objects
 threads = [

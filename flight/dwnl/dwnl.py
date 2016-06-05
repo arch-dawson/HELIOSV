@@ -17,22 +17,22 @@ from zlib import adler32
 # Write data to sender-specific data log file on board flight
 def logdata(packet, sender):
     if sender == "AD":
-        with open("/home/pi/hasp_temp/flight_anly/adcs.log", 'a') as log:
+        with open("/home/pi/HELIOSV/flight/adcs.log", 'a') as log:
             log.write(packet)
         print(packet, end="")
 
     if sender == "UP":
-        with open("/home/pi/hasp_temp/flight_anly/uplk.log", 'a') as log:
+        with open("/home/pi/HELIOSV/flight/uplk.log", 'a') as log:
             log.write(packet)
         print(packet, end="")
 
     if sender == "SE":
-        with open("/home/pi/hasp_temp/flight_anly/sens.log", 'a') as log:
+        with open("/home/pi/HELIOSV/flight/sens.log", 'a') as log:
             log.write(packet)
         print(packet, end="")
 
     if sender == "DW":
-        with open("/home/pi/hasp_temp/flight_anly/dwlk.log", 'a') as log:
+        with open("/home/pi/HELIOSV/flight/dwlk.log", 'a') as log:
             log.write(packet)
         print(packet, end="")
 
@@ -54,7 +54,7 @@ def main(downlink, gnd):
         ck = adler32(a_data) & 0xffffffff
         t = calendar.timegm(time.gmtime())  # Sec from epoch
         packet = "\x01CU HE %s %s %i %i %i\x02" % (sender, record, t, l, ck) + " " + data + "\x03\n"
-        with open("/home/pi/hasp_temp/flight_anly/downlink.log", 'a') as log:
+        with open("/home/pi/HELIOSV/flight/downlink.log", 'a') as log:
             log.write(packet)
     # Stores Data onboard each time ADCS data is put into downlink (1/6 second)
     # Downlinks ADCS data every 5 seconds
