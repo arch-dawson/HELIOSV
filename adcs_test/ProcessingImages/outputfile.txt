@@ -1,0 +1,16 @@
+found_1	Azimuth Off: 86.053906	Elevation Off: 44.612500
+found_2	Azimuth Off: 62.796094	Elevation Off: 26.337500
+found_3	Azimuth Off: 63.153906	Elevation Off: 23.470833
+found_4	Azimuth Off: 69.594531	Elevation Off: 26.695833
+found_5	Azimuth Off: 65.300781	Elevation Off: 26.695833
+found_6	Azimuth Off: 61.007031	Elevation Off: 24.904167
+found_7	Azimuth Off: 60.649219	Elevation Off: 22.754167
+found_8	Azimuth Off: 67.447656	Elevation Off: 49.987500
+found_9	Azimuth Off: 29.877344	Elevation Off: -12.720833
+found_10	Azimuth Off: 24.867969	Elevation Off: -40.312500
+found_11	Azimuth Off: 24.867969	Elevation Off: 17.737500
+found_12	Azimuth Off: -3.399219	Elevation Off: 33.862500
+found_13	Azimuth Off: 10.913281	Elevation Off: 19.170833
+found_14	Azimuth Off: -92.494531	Elevation Off: 55.720833
+found_15	Azimuth Off: 54.566406	Elevation Off: 32.070833
+found_16	Azimuth Off: -16.638281	Elevation Off: -63.245833
