@@ -59,14 +59,15 @@ gpio.setup(inhibit, gpio.IN)
 motorInhibit = True if gpio.input(inhibit) else False
 
 # Setting up nightMode event as a flag to be seen across threads
+# Event is like global boolean but safer for multithreading
 nightMode = threading.Event()
 
 # Package arg tuples for thread
 dwnl_args = (downlink, gnd_bus)
-uplk_args = (downlink, gnd_bus, adcs_cmd, sens_cmd, inputQ) # Implement nightMode here
+uplk_args = (downlink, gnd_bus, adcs_cmd, sens_cmd, inputQ, nightMode) # Implement nightMode here
 sens_args = (downlink, i2c_bus, camera, sens_cmd)
-adcs_args = (downlink, adcs_cmd, ele, azi, motorInhibit, camera)
-serv_args = (downlink, inputQ)
+adcs_args = (downlink, adcs_cmd, ele, azi, motorInhibit, camera, nightMode)
+serv_args = (downlink, inputQ, nightMode)
 
 # Create thread objects
 threads = [

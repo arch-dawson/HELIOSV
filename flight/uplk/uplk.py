@@ -15,7 +15,7 @@
 import time
 
 
-def main(downlink, ground, adcs, sens, inputQ):
+def main(downlink, ground, adcs, sens, inputQ, nightMode):
     downlink.put(["UP", "BU", "UPLK"])
     while True:
         time.sleep(2)
@@ -34,6 +34,8 @@ def main(downlink, ground, adcs, sens, inputQ):
                     if tar == b"\xAA":
                         if cmd == b"\xAA":
                             downlink.put(["UP", "AC", "ACK"])
+                        elif cmd == b"\xA0":
+                            downlink.put(["UP", "NM", str(nightMode.is_set())])
                     elif tar == b"\xBB":
                         adcs.put(cmd)
                     elif tar == b"\xC0":

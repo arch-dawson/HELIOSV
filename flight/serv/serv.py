@@ -18,6 +18,7 @@ import subprocess
 TCP_IP = '192.168.1.234'
 TCP_PORT = 8080
 BUFFER_SIZE = 1024
+nightModePrev = False
 
 def restart():
 	command = "/usr/bin/sudo /sbin/shutdown -r now"
@@ -34,7 +35,7 @@ def connect():
 	conn, addr = s.accept()
 
 
-def main(downlink, inputQ):
+def main(downlink, inputQ, nightMode):
 	connect()
 
 	data = conn.recv(BUFFER_SIZE).decode()
@@ -42,6 +43,9 @@ def main(downlink, inputQ):
 
 	#downlink.put(["BL", "RE", "successful connection to upper pi"])
 	while True:
+                if nightMode.is_set() != nightModePrev:
+                        conn.send("night".encode())
+                        nightModePrev = nightMode.is_set()
 		cmd=inputQ.get()
 		if cmd == b"\x01":
 			conn.send("reboot".encode())

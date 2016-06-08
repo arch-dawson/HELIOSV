@@ -36,8 +36,6 @@ RSET = 13
 az_steps = 12800
 ele_steps = 528
 
-nightMode = False;
-
 # Without Image Analysis, just use diode readings as degrees
 movingAvg = 8
 a_bias = 0  # Determined experimentally using gnomon
@@ -47,7 +45,7 @@ m = 1  # relationship between diode readings and degrees from sun
 deg_tol = .25  # minimum number of degrees to move to consider payload centered
 
 
-def main(downlink, cmd_queue, delev, daz, inhib, camera):
+def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
     # Set up instances of class
     azimuth = motors_smooth.MotorAZ(STPA, DRCA, MS1A, MS2A, MS3A)
     elevation = motors_smooth.MotorELE(STPE, DRCE, MS1E, MS2E, MS3E, RSET)
@@ -112,9 +110,9 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera):
                     run_anly = False
                     downlink.put(["AD", "AC", packet])
                 elif cmd == b"\xD0":
-                    nightMode = False
+                    nightMode.clear()
                 elif cmd == b"\xD1":
-                    nightMode = True
+                    nightMode.set()
                 elif cmd == b"\xC0":
                     pass
                     # Implement reset fxn call 
@@ -151,7 +149,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera):
                 else:
                     elevation.move(elevation.cnt)
 
-        elif nightMode: # Short code = best code.  :) 
+        elif nightMode.is_set(): # Short code = best code.  :) 
             continue
 
         else:  # MAIN FLIGHT LOOP
