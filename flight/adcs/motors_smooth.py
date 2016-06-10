@@ -153,7 +153,7 @@ class MotorAZ: # Azimuth motor
 
 
 class MotorELE: # Similar to previous class but for elevation motor instead of azimuth motor
-    def __init__(self, stp, drc, ms1, ms2, ms3, rset):
+    def __init__(self, stp, drc, ms1, ms2, ms3, rset, switchHit):
         self.stp = stp
         gpio.setup(stp, gpio.OUT)
         self.drc = drc
@@ -169,6 +169,7 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
         self.cnt = 0
         self.microsteps = 1
         self.wait = WaitTime
+        self.switchHit = switchHit
 
     def setStep(self, deg):
         # setting microsteps based on how far away the camera is from the sun
@@ -242,18 +243,35 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
         else:
             time.sleep(diode_wait / 2)
 
+    def checkSwitch(self): # Return true if switch has been hit
+        if gpio.input(rset):
+            self.cnt = 0
+            if not self.switchHit.is_set():
+                self.switchHit.set()
+        return self.switchHit.is_set()
+
+    def resetCount(self):
+        drc = False # Direction is UP
+        while not self.checkSwitch():
+            gpio.output(self.drc, drc) 
+            gpio.output(self.stp, True)
+            gpio.output(self.stp, False)
+            time.sleep(self.wait)
+
     def move(self, steps):
         steps = math.floor(steps)
-        if steps < 0: # Clockwise
+        if steps < 0: # Up
             drc = False
             self.cnt += -steps * (16 / self.microsteps)
-        elif steps > 0: # Counterclockwise
+        elif steps > 0: # Down
             drc = True
             self.cnt += -steps * (16 / self.microsteps)
         else:
             return
         for i in range(abs(steps)):
-            gpio.output(self.drc, drc)
+            if self.switchHit():
+                break
+            gpio.output(self.drc, drc) # Direction
             gpio.output(self.stp, True)
             gpio.output(self.stp, False)
             time.sleep(self.wait)

@@ -44,11 +44,13 @@ reading_tol = 1  # Noise in diode readings, needs to be  calculated using diode 
 m = 1  # relationship between diode readings and degrees from sun
 deg_tol = .25  # minimum number of degrees to move to consider payload centered
 
+# Setting up threading event for whether the reset switch has been hit
+switchHit = threading.Event()
 
 def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
     # Set up instances of class
     azimuth = motors_smooth.MotorAZ(STPA, DRCA, MS1A, MS2A, MS3A)
-    elevation = motors_smooth.MotorELE(STPE, DRCE, MS1E, MS2E, MS3E, RSET)
+    elevation = motors_smooth.MotorELE(STPE, DRCE, MS1E, MS2E, MS3E, RSET, switchHit)
 
     cali = calibrate.calibrate(camera)
 
@@ -113,8 +115,9 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                     nightMode.clear()
                 elif cmd == b"\xD1":
                     nightMode.set()
-                elif cmd == b"\xC0":
-                    pass
+                elif cmd == b"\xB0":
+                    elevation.resetCount()
+                    downlink.put(["AD", "SW", "Booty calling Steve"])
                     # Implement reset fxn call 
                 else:
                     downlink.put(["AD", "ER", packet])
@@ -137,6 +140,12 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                     downlink.put(["AD", "AC", str(cmd)])
                 else:
                     downlink.put(["AD", "ER", str(cmd)])
+
+        if switchHit.is_set():
+            downlink.put(["AD", "SW", "STEVE HAS BEEN TURNED ON"])
+            # Thank Haleigh for the above
+            # Steve is the switch's name
+            switchHit.clear()
 
         if panning:
             # azimuth.wait = 0.0008
