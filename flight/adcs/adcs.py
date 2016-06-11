@@ -13,6 +13,7 @@
 
 
 import time
+import threading 
 
 from adcs import motors_smooth
 from adcs import calibrate
@@ -115,7 +116,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                     nightMode.clear()
                 elif cmd == b"\xD1":
                     nightMode.set()
-                elif cmd == b"\xB0":
+                elif cmd == b"\xB0": # Reset function
                     elevation.resetCount()
                     downlink.put(["AD", "SW", "Booty calling Steve"])
                     # Implement reset fxn call 
@@ -162,7 +163,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             continue
 
         else:  # MAIN FLIGHT LOOP
-            loop_time += 1. / 6.
+            loop_time += 1. / 15. # Changed from 1/6 by Dawson on 6/10/16 
             try:
                 # Take azimuth diode reading
                 az_reading = daz.read()
@@ -210,7 +211,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 anly = False
 
             # Downlink results
-            if loop_time >= 1. / 6.:
+            if loop_time >= 1. / 15.:
                 if anly:
                     downlink.put(["AD", "AN", "%i, %f, %f" % (ret, degA, degE)])
                 downlink.put(["AD", "DI", "%f, %f" % (degA, degE)])
@@ -229,4 +230,4 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 else:
                     time.sleep(.025)
             if inhib: # If the "Remove Before Flight" pin is activated, don't turn
-                time.sleep(1. / 6.)
+                time.sleep(1. / 15.)

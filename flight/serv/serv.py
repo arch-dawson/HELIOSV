@@ -43,9 +43,9 @@ def main(downlink, inputQ, nightMode):
 
 	#downlink.put(["BL", "RE", "successful connection to upper pi"])
 	while True:
-                if nightMode.is_set() != nightModePrev:
-                        conn.send("night".encode())
-                        nightModePrev = nightMode.is_set()
+		if nightMode.is_set() != nightModePrev:
+			conn.send("night".encode())
+			nightModePrev = nightMode.is_set()
 		cmd=inputQ.get()
 		if cmd == b"\x01":
 			conn.send("reboot".encode())
