@@ -31,7 +31,7 @@ MS3A = 33
 MS1E = 40
 MS2E = 38
 MS3E = 36
-RSET = 13
+RSET = 15
 
 # Max steps
 az_steps = 12800
@@ -112,11 +112,12 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 elif cmd == b"\xB1":
                     run_anly = False
                     downlink.put(["AD", "AC", packet])
+                # Night mode on/off 
                 elif cmd == b"\xD0":
                     nightMode.clear()
                 elif cmd == b"\xD1":
                     nightMode.set()
-                elif cmd == b"\xB0": # Reset function
+                elif cmd == b"\xBF": # Reset function
                     elevation.resetCount()
                     downlink.put(["AD", "SW", "Booty calling Steve"])
                     # Implement reset fxn call 
@@ -144,6 +145,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
 
         if switchHit.is_set():
             downlink.put(["AD", "SW", "STEVE HAS BEEN TURNED ON"])
+            print("STEVE HAS BEEN TURNED ON")
             # Thank Haleigh for the above
             # Steve is the switch's name
             switchHit.clear()
@@ -160,10 +162,11 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                     elevation.move(elevation.cnt)
 
         elif nightMode.is_set(): # Short code = best code.  :) 
+            print("Night mode is ON")
             continue
 
         else:  # MAIN FLIGHT LOOP
-            loop_time += 1. / 15. # Changed from 1/6 by Dawson on 6/10/16 
+            loop_time += 1. / 6. # Changed from 1/6 by Dawson on 6/10/16 
             try:
                 # Take azimuth diode reading
                 az_reading = daz.read()
@@ -211,7 +214,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 anly = False
 
             # Downlink results
-            if loop_time >= 1. / 15.:
+            if loop_time >= 1. / 3.:
                 if anly:
                     downlink.put(["AD", "AN", "%i, %f, %f" % (ret, degA, degE)])
                 downlink.put(["AD", "DI", "%f, %f" % (degA, degE)])

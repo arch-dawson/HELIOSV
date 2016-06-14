@@ -243,22 +243,25 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
         else:
             time.sleep(diode_wait / 2)
 
-    def checkSwitch(self): # Return true if switch has been hit
-        if gpio.input(rset):
-            self.cnt = 0
+    def checkSwitch(self, drc): # Return true if switch has been hit
+        if gpio.input(self.rset):
+            self.cnt = 60
             if not self.switchHit.is_set():
                 self.switchHit.set()
-        return self.switchHit.is_set()
+        print(drc)
+        return self.switchHit.is_set() and (drc == False)
 
     def resetCount(self):
+        print("Got to reset in motors_smooth")
         drc = False # Direction is UP
-        while not self.checkSwitch():
+        while not self.checkSwitch(drc):
             gpio.output(self.drc, drc) 
             gpio.output(self.stp, True)
             gpio.output(self.stp, False)
             time.sleep(self.wait)
 
     def move(self, steps):
+        #print(gpio.input(self.rset))
         steps = math.floor(steps)
         if steps < 0: # Up
             drc = False
@@ -269,7 +272,8 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
         else:
             return
         for i in range(abs(steps)):
-            if self.switchHit():
+            print("Moving the thing, step:", i)
+            if self.checkSwitch(drc):
                 break
             gpio.output(self.drc, drc) # Direction
             gpio.output(self.stp, True)

@@ -18,7 +18,6 @@ import subprocess
 TCP_IP = '192.168.1.234'
 TCP_PORT = 8080
 BUFFER_SIZE = 1024
-nightModePrev = False
 
 def restart():
 	command = "/usr/bin/sudo /sbin/shutdown -r now"
@@ -37,6 +36,7 @@ def connect():
 
 def main(downlink, inputQ, nightMode):
 	connect()
+	nightModePrev = False
 
 	data = conn.recv(BUFFER_SIZE).decode()
 	downlink.put(["BL","RE",data])
