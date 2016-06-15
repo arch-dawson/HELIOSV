@@ -11,7 +11,6 @@
 #  COSGC HASP Helios V Team							       #
 # *********************************************************#
 import time
-import calendar
 from zlib import adler32
 
 # Write data to sender-specific data log file on board flight
@@ -35,6 +34,11 @@ def logdata(packet, sender):
         with open("/home/pi/HELIOSV/flight/dwlk.log", 'a') as log:
             log.write(packet)
         print(packet, end="")
+    if sender == "SV": # Server
+        with open("/home/pi/HELIOSV/flight/serv.log", 'a') as log:
+            log.write(packet)
+        print(packet, end="")
+
 
 def main(downlink, gnd):
     downlink.put(["DW", "BU", "DWNL"])
@@ -52,8 +56,8 @@ def main(downlink, gnd):
         else:
             a_data = data
         ck = adler32(a_data) & 0xffffffff
-        t = calendar.timegm(time.gmtime())  # Sec from epoch
-        packet = "\x01CU HE %s %s %i %i %i\x02" % (sender, record, t, l, ck) + " " + data + "\x03\n"
+        t = time.time()  # Sec from epoch
+        packet = "\x01CU HE %s %s %.2f %i %i\x02" % (sender, record, t, l, ck) + " " + data + "\x03\n"
         with open("/home/pi/HELIOSV/flight/downlink.log", 'a') as log:
             log.write(packet)
     # Stores Data onboard each time ADCS data is put into downlink (1/6 second)

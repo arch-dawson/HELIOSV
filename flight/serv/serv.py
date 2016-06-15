@@ -14,65 +14,99 @@ import socket
 import time
 import re
 import subprocess
+import threading
 
-TCP_IP = '192.168.1.234'
-TCP_PORT = 8080
-BUFFER_SIZE = 1024
+class Connection():
+	def __init__(self, downlink, inputQ, nightMode):
+		# Set up external arguments
+		self.downlink = downlink
+		self.inputQ = inputQ
+		self.nightMode = nightMode
+		self.TCP_IP = '192.168.1.234' # 127.0.0.1 works too, may need to change clnt
+		self.TCP_PORT = 8080
+		self.BUFFER_SIZE = 1024
 
-def restart():
-	command = "/usr/bin/sudo /sbin/shutdown -r now"
-	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+		# Successful bootup
+		self.downlink.put(["SV", "BU", "SERV"])
 
-rebootRe=re.compile('reboot', re.IGNORECASE)
+		# Night mode default is false
+		self.nightModePrev = False
 
-def connect():
-	global s, conn, addr
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	s.bind((TCP_IP, TCP_PORT))
-	s.listen(1)
-	conn, addr = s.accept()
+		# Create server connection
+		self.connect()
+
+		# Run flight loop
+		self.flight()
+
+	def checkNight(self): # Check if night mode has changed
+		if self.nightMode.is_set() != self.nightModePrev:
+			self.nightModePrev = self.nightMode.is_set()
+			return True
+		else:
+			return False
+
+	def heartBeat(self, message):
+		if checkNight():
+			message.append(' night')
+		#self.conn.send(message.encode())
+		print(message)
+
+	def connect(self):
+		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.s.bind((self.TCP_IP, self.TCP_PORT))
+		self.s.listen(5)
+		self.conn, self.addr = self.s.accept()
+
+	def receive(self):
+		self.data = self.conn.recv(self.BUFFER_SIZE).decode()
+		if self.data != None:
+			self.downlink.put(["BL", "HB", self.data]) 
+
+	def restart(self):
+		command = "/usr/bin/sudo /sbin/shutdown -r now"
+		process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+		self.s.close()
+
+	def command(self):
+		message = "heartbeat"
+		cmd = inputQ.get()
+		if cmd == b"\x01":
+			message.append(" reboot")
+		elif cmd == b"\x02":
+			message.append(" ping")
+		elif cmd == b"\x03":
+			message.append(" cpu")
+		elif cmd == b"\x04":
+			message.append(" temp")
+		elif cmd == b"\x05":
+			message.append(" disk")
+		elif cmd == b"\x06":
+			message.append(" faster")
+		elif cmd == b"\x07":
+			message.append(" slower")
+		elif cmd == b"\x08":
+			message.append(" reboot")
+			threading.Timer(5.0, self.restart).start()
+		elif cmd == b"\x09":
+			message.append(" image")
+		elif len(cmd) > 0:
+			self.downlink.put(["SV", "BL", "ER"])
+		return message			
+
+	def flight(self):
+		self.downlink.put(["BL","BU","CLNT"])
+		while True:
+			print(self.inputQ.empty())
+			if not self.inputQ.empty():
+				message = self.command()
+			else: 
+				message = "heartbeat"
+			self.heartBeat(message)
+			time.sleep(3)
+			self.receive()
+			time.sleep(2)
 
 
 def main(downlink, inputQ, nightMode):
-	connect()
-	nightModePrev = False
-
-	data = conn.recv(BUFFER_SIZE).decode()
-	downlink.put(["BL","RE",data])
-
-	#downlink.put(["BL", "RE", "successful connection to upper pi"])
-	while True:
-		if nightMode.is_set() != nightModePrev:
-			conn.send("night".encode())
-			nightModePrev = nightMode.is_set()
-		cmd=inputQ.get()
-		if cmd == b"\x01":
-			conn.send("reboot".encode())
-		elif cmd == b"\x02":
-			conn.send("ping".encode())
-		elif cmd == b"\x03":
-			conn.send("cpu".encode())
-		elif cmd == b"\x04":
-			conn.send("temp".encode())
-		elif cmd == b"\x05":
-			conn.send("disk".encode())
-		elif cmd == b"\x06":
-			conn.send("faster".encode())
-		elif cmd == b"\x07":
-			conn.send("slower".encode())
-		elif cmd == b"\x08":
-			conn.send("reboot".encode())
-			downlink.put(["BL","BL", "     Rebooting BOTH pi's now"])
-			restart()
-		elif cmd == b"\x09":
-			conn.send("image".encode())
-		else:
-			downlink.put(["BL", "ER", cmd])
-
-
-		data = conn.recv(BUFFER_SIZE).decode()
-		downlink.put(["BL", "RE", data])
-		if rebootRe.search(data):
-			s.close()
-			connect()
+	connection = Connection(downlink, inputQ, nightMode)

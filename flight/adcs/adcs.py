@@ -34,8 +34,9 @@ MS3E = 36
 RSET = 15
 
 # Max steps
-az_steps = 12800
-ele_steps = 528
+az_steps = 12800 # = 360 deg * (4 steps / 1.8 deg) * (16 microsteps / step)
+ele_steps = 710 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step) 
+# HELIOS can look 'up' 60 degrees, and 'down' 20 degrees. 
 
 # Without Image Analysis, just use diode readings as degrees
 movingAvg = 8
@@ -154,9 +155,9 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             # azimuth.wait = 0.0008
             azimuth.move(64)  # make sure this is greater than the tolerance!
             # time.sleep(0.22)
-            if azimuth.cnt >= az_steps:
+            if azimuth.cnt >= az_steps: # Went more than 360 deg
                 azimuth.move(-azimuth.cnt)
-                if elevation.cnt <= ele_steps - (10 / .1125):
+                if elevation.cnt <= ele_steps - (10 / .1125): 
                     elevation.move(-10 / 0.1125)
                 else:
                     elevation.move(elevation.cnt)
@@ -166,7 +167,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             continue
 
         else:  # MAIN FLIGHT LOOP
-            loop_time += 1. / 6. # Changed from 1/6 by Dawson on 6/10/16 
+            loop_time += 1. / 6. 
             try:
                 # Take azimuth diode reading
                 az_reading = daz.read()
@@ -218,7 +219,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 if anly:
                     downlink.put(["AD", "AN", "%i, %f, %f" % (ret, degA, degE)])
                 downlink.put(["AD", "DI", "%f, %f" % (degA, degE)])
-                downlink.put(["AD", "MC", "%i, %i" % (azimuth.cnt, elevation.cnt)])
+                downlink.put(["AD", "MC", "%i %i, %i %i" % (azimuth.cnt, (azimuth.cnt*12800/360), elevation.cnt, (elevation.cnt*528/80))])
                 loop_time = 0
 
             # Turn based on degrees
