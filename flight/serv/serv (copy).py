@@ -16,9 +16,6 @@ import re
 import subprocess
 import threading
 
-msgLock = threading.Lock()
-# Make sure message can only be changed by one thing at a time 
-
 class Connection():
 	def __init__(self, downlink, inputQ, nightMode):
 		# Set up external arguments
@@ -49,13 +46,10 @@ class Connection():
 			return False
 
 	def heartBeat(self, message):
-                with msgLock:
-                        if checkNight():
-                                self.message.append(' night')
-                        #self.conn.send(message.encode())
-                        print(self.message)
-                        self.message = "heartbeat"
-		threading.Timer(5.0, self.heartBeat).start()
+		if checkNight():
+			message.append(' night')
+		#self.conn.send(message.encode())
+		print(message)
 
 	def connect(self):
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -75,38 +69,44 @@ class Connection():
 		self.s.close()
 
 	def command(self):
+		message = "heartbeat"
 		cmd = inputQ.get()
-		with msgLock:
-                        if cmd == b"\x01":
-                                self.message.append(" reboot")
-                        elif cmd == b"\x02":
-                                self.message.append(" ping")
-                        elif cmd == b"\x03":
-                                self.message.append(" cpu")
-                        elif cmd == b"\x04":
-                                self.message.append(" temp")
-                        elif cmd == b"\x05":
-                                self.message.append(" disk")
-                        elif cmd == b"\x06":
-                                self.message.append(" faster")
-                        elif cmd == b"\x07":
-                                self.message.append(" slower")
-                        elif cmd == b"\x08":
-                                self.message.append(" reboot")
-                                threading.Timer(7.0, self.restart).start()
-                        elif cmd == b"\x09":
-                                self.message.append(" image")
-                        elif len(cmd) > 0:
-                                self.downlink.put(["SV", "BL", "ER"])			
+		if cmd == b"\x01":
+			message.append(" reboot")
+		elif cmd == b"\x02":
+			message.append(" ping")
+		elif cmd == b"\x03":
+			message.append(" cpu")
+		elif cmd == b"\x04":
+			message.append(" temp")
+		elif cmd == b"\x05":
+			message.append(" disk")
+		elif cmd == b"\x06":
+			message.append(" faster")
+		elif cmd == b"\x07":
+			message.append(" slower")
+		elif cmd == b"\x08":
+			message.append(" reboot")
+			threading.Timer(5.0, self.restart).start()
+		elif cmd == b"\x09":
+			message.append(" image")
+		elif len(cmd) > 0:
+			self.downlink.put(["SV", "BL", "ER"])
+		return message			
 
 	def flight(self):
 		self.downlink.put(["BL","BU","CLNT"])
-		threading.Timer(5.0, self.heartBeat).start()
 		while True:
 			print(self.inputQ.empty())
 			if not self.inputQ.empty():
-				self.command()
+				message = self.command()
+			else: 
+				message = "heartbeat"
+			self.heartBeat(message)
+			time.sleep(3)
 			self.receive()
+			time.sleep(2)
+
 
 def main(downlink, inputQ, nightMode):
 	connection = Connection(downlink, inputQ, nightMode)

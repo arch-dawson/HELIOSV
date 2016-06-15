@@ -75,7 +75,7 @@ threads = [
     threading.Thread(name='dwnl', target=dwnl.main, args=dwnl_args),
     threading.Thread(name='uplk', target=uplk.main, args=uplk_args),
     threading.Thread(name='sens', target=sens.main, args=sens_args),
-#    threading.Thread(name='adcs', target=adcs.main, args=adcs_args),
+    threading.Thread(name='adcs', target=adcs.main, args=adcs_args),
     threading.Thread(name='serv', target=serv.main, args=serv_args)
 ]
 
