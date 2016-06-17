@@ -17,16 +17,15 @@ CAM_INTERVAL = 10  # seconds
 TEMP_INTERVAL = 10
 PRES_INTERVAL = 10
 AG_INTERVAL = 10
-#GP_INTERVAL = 1
 
 
-def main(downlink, i2c, camera, cmd_queue):
+def main(downlink, i2c, camera, cmd_queue, tempLED):
 
     sensors.ag_init(i2c)
     scheduler = sensors.PeriodicScheduler()
     scheduler.setup(AG_INTERVAL, sensors.ag, [downlink, i2c])
     scheduler.setup(CAM_INTERVAL, sensors.capt, [camera])
-    scheduler.setup(TEMP_INTERVAL, sensors.temp, [downlink])
+    scheduler.setup(TEMP_INTERVAL, sensors.temp, [downlink, tempLED])
     scheduler.setup(PRES_INTERVAL, sensors.pres, [downlink, i2c])
 
     scheduler.run()

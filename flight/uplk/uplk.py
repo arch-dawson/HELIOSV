@@ -14,8 +14,14 @@
 
 import time
 
+# Turns on command LED after a commad has been received, serv will turn it off
+def setcmdLED(cmdLED):
+    if not cmdLED.is_set():
+        cmdLED.set()
+    return
 
-def main(downlink, ground, adcs, sens, inputQ, nightMode):
+
+def main(downlink, ground, adcs, sens, inputQ, nightMode, cmdLED):
     downlink.put(["UP", "BU", "UPLK"])
     while True:
         time.sleep(2)
@@ -28,7 +34,7 @@ def main(downlink, ground, adcs, sens, inputQ, nightMode):
             cr_ = ground.waitByte()
             lf_ = ground.waitByte()
             packet = hex(int.from_bytes((soh + stx + tar + cmd + etx), byteorder='big'))
-            #downlink.put(["soh = ", hex(int.from_bytes(soh, byteorder='big')), "<3"])
+            setcmdLED(cmdLED)
             if soh == b"\x01" and etx == b"\x03":
                 if stx == b"\x02":
                     if tar == b"\xAA":

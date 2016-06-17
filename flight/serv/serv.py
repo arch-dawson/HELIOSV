@@ -20,11 +20,13 @@ msgLock = threading.Lock()
 # Make sure message can only be changed by one thing at a time 
 
 class Connection():
-	def __init__(self, downlink, inputQ, nightMode):
+	def __init__(self, downlink, inputQ, nightMode, tempLED, cmdLED):
 		# Set up external arguments
 		self.downlink = downlink
 		self.inputQ = inputQ
 		self.nightMode = nightMode
+		self.tempLED = tempLED
+		self.cmdLED = cmdLED
 		self.TCP_IP = '192.168.1.234' # 127.0.0.1 works too, may need to change clnt
 		self.TCP_PORT = 8080
 		self.BUFFER_SIZE = 1024
@@ -48,10 +50,25 @@ class Connection():
 		else:
 			return False
 
+	def checkTemp(self):
+                if self.tempLED.is_set():
+                        self.tempLED.clear()
+                        return True
+                else:
+                        return False
+
+        def checkCmd(self):
+                if self.cmdLED.is_set():
+                        self.cmdLED.clear()
+                        return True
+                else:
+                        return False
+
 	def heartBeat(self, message):
                 with msgLock:
-                        if checkNight():
-                                self.message.append(' night')
+                        self.message += ' night' if self.checkNight() else ''
+                        self.message += ' command' if self.checkCmd() else ''
+                        self.message += ' temp' if self.checkTemp() else ''
                         #self.conn.send(message.encode())
                         print(self.message)
                         self.message = "heartbeat"
@@ -78,24 +95,24 @@ class Connection():
 		cmd = inputQ.get()
 		with msgLock:
                         if cmd == b"\x01":
-                                self.message.append(" reboot")
+                                self.message += " reboot"
                         elif cmd == b"\x02":
-                                self.message.append(" ping")
+                                self.message += " ping"
                         elif cmd == b"\x03":
-                                self.message.append(" cpu")
+                                self.message += " cpu"
                         elif cmd == b"\x04":
-                                self.message.append(" temp")
+                                self.message += " temp"
                         elif cmd == b"\x05":
-                                self.message.append(" disk")
+                                self.message += " disk"
                         elif cmd == b"\x06":
-                                self.message.append(" faster")
+                                self.message += " faster"
                         elif cmd == b"\x07":
-                                self.message.append(" slower")
+                                self.message += " slower"
                         elif cmd == b"\x08":
-                                self.message.append(" reboot")
+                                self.message += " reboot"
                                 threading.Timer(7.0, self.restart).start()
                         elif cmd == b"\x09":
-                                self.message.append(" image")
+                                self.message += " image"
                         elif len(cmd) > 0:
                                 self.downlink.put(["SV", "BL", "ER"])			
 
@@ -108,5 +125,5 @@ class Connection():
 				self.command()
 			self.receive()
 
-def main(downlink, inputQ, nightMode):
-	connection = Connection(downlink, inputQ, nightMode)
+def main(downlink, inputQ, nightMode, tempLED, cmdLED):
+	connection = Connection(downlink, inputQ, nightMode, tempLED, cmdLED)

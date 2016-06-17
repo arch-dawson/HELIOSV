@@ -30,6 +30,8 @@ AG_REG_GY = 0x45
 AG_REG_GZ = 0x47
 
 temp_cal = [58.1723, 2.0657, 2.1016, 2.1210, 1.7322, 1.4072, 2.0503, 1.9183, 1.5197, 55.7113]
+temp_max = [ 120.,  120.,  120.,  120.,  120.,  120.,  120.,  120.,  120., 120.,  120.,  120.,  120.,  120.]
+# Above max is a place holder, can replace with actual values later
 
 class PeriodicScheduler:
     def __init__(self):
@@ -55,8 +57,14 @@ def capt(camera):
     t = calendar.timegm(time.gmtime())
     camera.save("/home/pi/hasp_temp/flight_anly/images/%i.png" % t)
 
+def tempCheck(tempLED, temps):
+    # Checks if any temperature readings are outside expected values
+    tempBools = [tempI > maxI for tempI,maxI in zip(temps,temp_max)]
+    # Returns true if one or more things is on fire. :( 
+    return any(tempBools) 
 
-def temp(downlink):
+
+def temp(downlink, tempLED):
     try:
         data_raw = []
         data = []
@@ -65,6 +73,9 @@ def temp(downlink):
         for i in range(len(data_raw)):
             data.append(data_raw[i])
             #data.append(temp_cal[i] + data_raw[i])
+        if (not tempLED.is_set()) and tempCheck():
+            # If the flag isn't set, and things are on fire. 
+            tempLED.set()
         downlink.put(["SE", "T%i" % (len(data)), cs_str(data)])
     except:
         pass

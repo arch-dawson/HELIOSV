@@ -59,16 +59,19 @@ inhibit = 12
 gpio.setup(inhibit, gpio.IN)
 motorInhibit = True if gpio.input(inhibit) else False
 
-# Setting up nightMode event as a flag to be seen across threads
+# Setting up events to be seen across threads
 # Event is like global boolean but safer for multithreading
-nightMode = threading.Event()
+nightMode = threading.Event() # Whether night mode is currently on
+tempLED = threading.Event() # Tracks if any temperatures above normal levels
+cmdLED = threading.Event() # When a command has been received 
+
 
 # Package arg tuples for thread
 dwnl_args = (downlink, gnd_bus)
-uplk_args = (downlink, gnd_bus, adcs_cmd, sens_cmd, inputQ, nightMode) # Implement nightMode here
-sens_args = (downlink, i2c_bus, camera, sens_cmd)
+uplk_args = (downlink, gnd_bus, adcs_cmd, sens_cmd, inputQ, nightMode, cmdLED) # Implement nightMode here
+sens_args = (downlink, i2c_bus, camera, sens_cmd, tempLED)
 adcs_args = (downlink, adcs_cmd, ele, azi, motorInhibit, camera, nightMode)
-serv_args = (downlink, inputQ, nightMode)
+serv_args = (downlink, inputQ, nightMode, tempLED, cmdLED)
 
 # Create thread objects
 threads = [
