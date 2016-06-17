@@ -25,7 +25,7 @@ class Connection():
 		self.downlink = downlink
 		self.inputQ = inputQ
 		self.nightMode = nightMode
-		self.TCP_IP = '192.168.1.234' # 127.0.0.1 works too, may need to change clnt
+		self.TCP_IP = '127.0.0.1' # 127.0.0.1  or 192.168.1.234
 		self.TCP_PORT = 8080
 		self.BUFFER_SIZE = 1024
 
@@ -49,12 +49,12 @@ class Connection():
 			return False
 
 	def heartBeat(self, message):
-                with msgLock:
-                        if checkNight():
-                                self.message.append(' night')
-                        #self.conn.send(message.encode())
-                        print(self.message)
-                        self.message = "heartbeat"
+		with msgLock:
+			if checkNight():
+				self.message.append(' night')
+			self.conn.send(message.encode())
+			print(self.message)
+			self.message = "heartbeat"
 		threading.Timer(5.0, self.heartBeat).start()
 
 	def connect(self):
