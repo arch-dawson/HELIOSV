@@ -69,7 +69,7 @@ class Connection():
 		with msgLock:
 			self.message += ' night' if self.checkNight() else ''
 			self.message += ' command' if self.checkCmd() else ''
-			self.message += ' temp' if self.checkTemp() else ''
+			self.message += ' fire' if self.checkTemp() else ''
 			self.conn.send(self.message.encode())
 			self.message = "heartbeat"
 
