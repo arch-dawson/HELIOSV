@@ -68,7 +68,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
 
     anly_tolerance = 3.5
 
-    downlink.put(["AD", "BU", "ADCS"])
+    downlink.put(["AD", "BU", "ADCS"]) # Bootup message
 
     while True:  # Flight loop
         while not cmd_queue.empty():  # Command Handling
@@ -106,11 +106,11 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                     time.sleep(1. / 6.)
                     downlink.put(["AD", "AC", packet])
                 # Turn on image analysis
-                elif cmd == b"\xB0":
+                elif cmd == b"\xB1":
                     run_anly = True
                     downlink.put(["AD", "AC", packet])
                 # Turn off image analysis
-                elif cmd == b"\xB1":
+                elif cmd == b"\xB0":
                     run_anly = False
                     downlink.put(["AD", "AC", packet])
                 # Night mode on/off
@@ -120,7 +120,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                     nightMode.set()
                 elif cmd == b"\xBF": # Reset function
                     elevation.resetCount()
-                    downlink.put(["AD", "SW", "Booty calling Steve"])
+                    downlink.put(["AD", "SW", "RSET"])
                     # Implement reset fxn call
                 else:
                     downlink.put(["AD", "ER", packet])
@@ -145,7 +145,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                     downlink.put(["AD", "ER", str(cmd)])
 
         if switchHit.is_set():
-            downlink.put(["AD", "SW", "STEVE HAS BEEN TURNED ON"])
+            downlink.put(["AD", "SW", "HIT"])
             print("STEVE HAS BEEN TURNED ON")
             # Thank Haleigh for the above
             # Steve is the switch's name

@@ -88,7 +88,7 @@ class Connection():
                 data = self.conn.recv(self.BUFFER_SIZE).decode()
             self.downlink.put(["SV", "HB", data])
         except:
-            self.downlink.put(["SV","BL","Connection Lost"])
+            self.downlink.put(["SV","BL","ER"])
             self.connect()
         return
 
