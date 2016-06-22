@@ -1,14 +1,14 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 
 import sens.sensors as sensors
@@ -19,7 +19,7 @@ PRES_INTERVAL = 10
 AG_INTERVAL = 10
 
 
-def main(downlink, i2c, camera, cmd_queue, tempLED):
+def main(downlink, i2c, camera, tempLED):
 
     sensors.ag_init(i2c)
     scheduler = sensors.PeriodicScheduler()

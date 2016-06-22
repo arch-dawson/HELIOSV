@@ -1,14 +1,14 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 
 import sched
@@ -60,8 +60,8 @@ def capt(camera):
 def tempCheck(tempLED, temps):
     # Checks if any temperature readings are outside expected values
     tempBools = [tempI > maxI for tempI,maxI in zip(temps,temp_max)]
-    # Returns true if one or more things is on fire. :( 
-    return any(tempBools) 
+    # Returns true if one or more things is on fire. :(
+    return any(tempBools)
 
 
 def temp(downlink, tempLED):
@@ -74,7 +74,7 @@ def temp(downlink, tempLED):
             data.append(data_raw[i])
             #data.append(temp_cal[i] + data_raw[i])
         if (not tempLED.is_set()) and tempCheck():
-            # If the flag isn't set, and things are on fire. 
+            # If the flag isn't set, and things are on fire.
             tempLED.set()
         downlink.put(["SE", "T%i" % (len(data)), cs_str(data)])
     except:

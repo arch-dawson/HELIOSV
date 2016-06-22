@@ -1,14 +1,14 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 
 
@@ -56,8 +56,6 @@ def main(downlink, ground, adcs, sens, inputQ, nightMode, cmdLED):
                     elif tar == b"\xD1":
                         nudge = int.from_bytes(cmd, byteorder='big') + 180
                         adcs.put(nudge)
-                    elif tar == b"\xEE":
-                        sens.put(cmd)
                     elif tar == b"\xFF":
                         inputQ.put(cmd)
                     else:

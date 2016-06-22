@@ -1,14 +1,14 @@
 #*********************************************************#
-#   COSGC Presents										  #
+#   COSGC Presents                                                                                #
 #      __  __________    ________  _____    _____    __   #
 #     / / / / ____/ /   /  _/ __ \/ ___/   /  _/ |  / /   #
 #    / /_/ / __/ / /    / // / / /\__ \    / / | | / /    #
 #   / __  / /___/ /____/ // /_/ /___/ /  _/ /  | |/ /     #
 #  /_/ /_/_____/_____/___/\____//____/  /___/  |___/      #
 #                                                         #
-#   													  #
-#  Copyright (c) 2015 University of Colorado Boulder	  #
-#  COSGC HASP Helios IV Team							  #
+#                                                                                                         #
+#  Copyright (c) 2015 University of Colorado Boulder      #
+#  COSGC HASP Helios IV Team                                                      #
 #*********************************************************#
 
 
@@ -200,7 +200,7 @@ class MotorELE():
                     time.sleep(diode_wait/2)
 
             elif self.cnt < 0 and steps < 0:
-                    self.move(steps)
+                self.move(steps)
             else:
                 time.sleep(diode_wait/2)
         else:

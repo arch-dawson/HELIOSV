@@ -1,19 +1,19 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 
 
 import time
-import threading 
+import threading
 
 from adcs import motors_smooth
 from adcs import calibrate
@@ -35,8 +35,8 @@ RSET = 15
 
 # Max steps
 az_steps = 12800 # = 360 deg * (4 steps / 1.8 deg) * (16 microsteps / step)
-ele_steps = 710 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step) 
-# HELIOS can look 'up' 60 degrees, and 'down' 20 degrees. 
+ele_steps = 710 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step)
+# HELIOS can look 'up' 60 degrees, and 'down' 20 degrees.
 
 # Without Image Analysis, just use diode readings as degrees
 movingAvg = 8
@@ -113,7 +113,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 elif cmd == b"\xB1":
                     run_anly = False
                     downlink.put(["AD", "AC", packet])
-                # Night mode on/off 
+                # Night mode on/off
                 elif cmd == b"\xD0":
                     nightMode.clear()
                 elif cmd == b"\xD1":
@@ -121,7 +121,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 elif cmd == b"\xBF": # Reset function
                     elevation.resetCount()
                     downlink.put(["AD", "SW", "Booty calling Steve"])
-                    # Implement reset fxn call 
+                    # Implement reset fxn call
                 else:
                     downlink.put(["AD", "ER", packet])
             # Nudge
@@ -157,17 +157,17 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             # time.sleep(0.22)
             if azimuth.cnt >= az_steps: # Went more than 360 deg
                 azimuth.move(-azimuth.cnt)
-                if elevation.cnt <= ele_steps - (10 / .1125): 
+                if elevation.cnt <= ele_steps - (10 / .1125):
                     elevation.move(-10 / 0.1125)
                 else:
                     elevation.move(elevation.cnt)
 
-        elif nightMode.is_set(): # Short code = best code.  :) 
+        elif nightMode.is_set(): # Short code = best code.  :)
             print("Night mode is ON")
             continue
 
         else:  # MAIN FLIGHT LOOP
-            loop_time += 1. / 6. 
+            loop_time += 1. / 6.
             try:
                 # Take azimuth diode reading
                 az_reading = daz.read()
@@ -180,11 +180,11 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 pass
 
             # Moving average filter
-            
+
             # Add new reading to moving average
             eleArray.append(ele_reading)
             azArray.append(az_reading)
-            
+
             # Remove old reading from moving average
             azArray.pop(0)
             eleArray.pop(0)
@@ -228,7 +228,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 if abs(degA) > deg_tol: # If azimuth reading is outside the tolerance
                     azimuth.turnStep(degA, False, anly) # Turn the azimuth motor
                 else:
-                    time.sleep(.025) 
+                    time.sleep(.025)
                 if abs(degE) > deg_tol: # If elevation reading is outside the tolerance
                     elevation.turnStep(degE, False, anly) # Turn the elevation motor
                 else:

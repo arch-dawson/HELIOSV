@@ -71,10 +71,10 @@ Move the structure by how off they are, and store the info for a correlation
 # Initiate and connect
 cap = cv2.VideoCapture(0)
 if cap.isOpened():
-	print("Camera open...")
+    print("Camera open...")
 else:
-	cap.open()
-	print("Camera opened...")
+    cap.open()
+    print("Camera opened...")
 
 k = 0
 j = 0
@@ -184,7 +184,7 @@ while 1:
 
     print('Azimuth Off: %f\tElevation Off: %f' % (calDegX, calDegY))
     outfile.write('found_%d\tAzimuth Off: %f\tElevation Off: %f\n' %
-				   (j,calDegX, calDegY))
+                                   (j,calDegX, calDegY))
 
     if(calDegX > az_tolerance):
         gpio.output(DRCA, True)

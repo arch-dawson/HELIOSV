@@ -17,7 +17,7 @@ MS3E = 36
 
 waittime1 =(1./6.)/16
 waittime2 =0
- 
+
 gpio.setmode(gpio.BOARD)
 gpio.setup(STPA, gpio.OUT)
 gpio.setup(DRCA, gpio.OUT)
@@ -39,15 +39,15 @@ gpio.output(SLPE, True)
 
 
 '''for i in range(0,400):
-	gpio.output(DRCE, False)
-		
-	gpio.output(MS1E, True)
-	gpio.output(MS2E, True)
-	gpio.output(MS3E, True)
+        gpio.output(DRCE, False)
 
-	gpio.output(STPE, True)
-	gpio.output(STPE, False)
-	time.sleep(waittime2)'''
+        gpio.output(MS1E, True)
+        gpio.output(MS2E, True)
+        gpio.output(MS3E, True)
+
+        gpio.output(STPE, True)
+        gpio.output(STPE, False)
+        time.sleep(waittime2)'''
 
 
 microsteps = 16
@@ -58,14 +58,14 @@ steps = 1600
 drc = False
 
 for i in range(steps):
-	for i in range(8):
-		gpio.output(DRCA, drc)
-		gpio.output(MS1A, True)
-		gpio.output(MS2A, True)
-		gpio.output(MS3A, True)
-		gpio.output(STPA, True)
-		gpio.output(STPA, False)
-		time.sleep(waittime1)
-	time.sleep(waittime2)
+    for i in range(8):
+        gpio.output(DRCA, drc)
+        gpio.output(MS1A, True)
+        gpio.output(MS2A, True)
+        gpio.output(MS3A, True)
+        gpio.output(STPA, True)
+        gpio.output(STPA, False)
+        time.sleep(waittime1)
+    time.sleep(waittime2)
 
 gpio.cleanup()

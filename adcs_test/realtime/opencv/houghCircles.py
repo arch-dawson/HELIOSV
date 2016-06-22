@@ -19,10 +19,10 @@ circles = cv2.HoughCircles(gimg, cv2.HOUGH_GRADIENT, 1, 10,
                            param1=50,param2=25,minRadius=0,maxRadius=0)
 
 try:
-	a, b, c = circles.shape
+    a, b, c = circles.shape
 except:
-	print ('No circles found!!!')
-	sys.exit()
+    print ('No circles found!!!')
+    sys.exit()
 
 print('circles.shape')
 print(a,b,c)
@@ -50,8 +50,8 @@ rows, cols = circles[0,:].shape
 
 # Draw the found circles
 for i in range(b):
-  cv2.circle(gimg, (circles[0][i][0], circles[0][i][1]), circles[0][i][2], (0, 255, 0), 2)
-  cv2.circle(gimg, (circles[0][i][0], circles[0][i][1]), 2, (255,0,0), 3, cv2.LINE_AA)
+    cv2.circle(gimg, (circles[0][i][0], circles[0][i][1]), circles[0][i][2], (0, 255, 0), 2)
+    cv2.circle(gimg, (circles[0][i][0], circles[0][i][1]), 2, (255,0,0), 3, cv2.LINE_AA)
 
 
 print('CenterPtY: ', circles[0][0][1])

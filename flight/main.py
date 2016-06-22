@@ -1,14 +1,14 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 
 
@@ -63,13 +63,13 @@ motorInhibit = True if gpio.input(inhibit) else False
 # Event is like global boolean but safer for multithreading
 nightMode = threading.Event() # Whether night mode is currently on
 tempLED = threading.Event() # Tracks if any temperatures above normal levels
-cmdLED = threading.Event() # When a command has been received 
+cmdLED = threading.Event() # When a command has been received
 
 
 # Package arg tuples for thread
 dwnl_args = (downlink, gnd_bus)
-uplk_args = (downlink, gnd_bus, adcs_cmd, sens_cmd, inputQ, nightMode, cmdLED) # Implement nightMode here
-sens_args = (downlink, i2c_bus, camera, sens_cmd, tempLED)
+uplk_args = (downlink, gnd_bus, adcs_cmd, inputQ, nightMode, cmdLED) # Implement nightMode here
+sens_args = (downlink, i2c_bus, camera, tempLED)
 adcs_args = (downlink, adcs_cmd, ele, azi, motorInhibit, camera, nightMode)
 serv_args = (downlink, inputQ, nightMode, tempLED, cmdLED)
 
