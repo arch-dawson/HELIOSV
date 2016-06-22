@@ -245,11 +245,11 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
 
     def checkSwitch(self, drc): # Return true if switch has been hit
         if gpio.input(self.rset):
-            self.cnt = 60
+            self.cnt = 0
             if not self.switchHit.is_set():
                 self.switchHit.set()
-        print(drc)
         return self.switchHit.is_set() and (drc == False)
+    # Still want to be able to turn AWAY from switch.
 
     def resetCount(self):
         print("Got to reset in motors_smooth")

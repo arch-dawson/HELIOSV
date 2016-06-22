@@ -157,7 +157,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             # time.sleep(0.22)
             if azimuth.cnt >= az_steps: # Went more than 360 deg
                 azimuth.move(-azimuth.cnt)
-                if elevation.cnt <= ele_steps - (10 / .1125):
+                if elevation.cnt <= ele_steps - (10 / .1125): # .1125 = 1.8/16
                     elevation.move(-10 / 0.1125)
                 else:
                     elevation.move(elevation.cnt)
@@ -219,7 +219,8 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 if anly:
                     downlink.put(["AD", "AN", "%i, %f, %f" % (ret, degA, degE)])
                 downlink.put(["AD", "DI", "%f, %f" % (degA, degE)])
-                downlink.put(["AD", "MC", "%i %i, %i %i" % (azimuth.cnt, (azimuth.cnt*12800/360), elevation.cnt, (elevation.cnt*528/80))])
+                downlink.put(["AD", "MC", "%i %i, %i %i" % (azimuth.cnt, (azimuth.cnt*az_steps/360), elevation.cnt, ((elevation.cnt*ele_steps/80)))-20])
+                # The -20 above is to make the printed degree count resemble the physical degree count.  i.e. Zero degrees is flat
                 loop_time = 0
 
             # Turn based on degrees
