@@ -38,30 +38,30 @@ def main(downlink, ground, adcs, sens, inputQ, nightMode, cmdLED):
             if soh == b"\x01" and etx == b"\x03":
                 if stx == b"\x02":
                     if tar == b"\xAA":
-                        if cmd == b"\xAA":
+                        if cmd == b"\xAA": # Ping lower pi
                             downlink.put(["UP", "AC", "ACK"])
                         elif cmd == b"\xA0":
                             downlink.put(["UP", "NM", str(nightMode.is_set())])
-                    elif tar == b"\xBB":
+                    elif tar == b"\xBB": # Send command to ADCS thread
                         adcs.put(cmd)
-                    elif tar == b"\xC0":
+                    elif tar == b"\xC0": # CCW
                         nudge = - int.from_bytes(cmd, byteorder='big')
                         adcs.put(nudge)
-                    elif tar == b"\xC1":
+                    elif tar == b"\xC1": # CW
                         nudge = int.from_bytes(cmd, byteorder='big')
                         adcs.put(nudge)
-                    elif tar == b"\xD0":
+                    elif tar == b"\xD0": # Look up (nudge)
                         nudge = - int.from_bytes(cmd, byteorder='big') - 180
                         adcs.put(nudge)
-                    elif tar == b"\xD1":
+                    elif tar == b"\xD1": # Look down (nudge)
                         nudge = int.from_bytes(cmd, byteorder='big') + 180
                         adcs.put(nudge)
-                    elif tar == b"\xFF":
+                    elif tar == b"\xFF": # Sending command to upper Pi
                         inputQ.put(cmd)
                     else:
-                        downlink.put(["UP", "ER", packet])
+                        downlink.put(["UP", "ER", packet]) 
                 elif stx == b"\x30":
-                    pass  # Handle GPS data if necessary
+                    pass  
                 else:
                     downlink.put(["UP", "ER", packet])
             else:
