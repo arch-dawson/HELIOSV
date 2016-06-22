@@ -1,14 +1,14 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 
 
@@ -23,6 +23,7 @@ gpio.setmode(gpio.BOARD)
 
 def shutdown():
     """ Completes all necessary events for a shutdown """
+    print("Hey, this works!")
     camera.close()
     exit()
 
@@ -58,16 +59,19 @@ inhibit = 12
 gpio.setup(inhibit, gpio.IN)
 motorInhibit = True if gpio.input(inhibit) else False
 
-# Setting up nightMode event as a flag to be seen across threads
+# Setting up events to be seen across threads
 # Event is like global boolean but safer for multithreading
-nightMode = threading.Event()
+nightMode = threading.Event() # Whether night mode is currently on
+tempLED = threading.Event() # Tracks if any temperatures above normal levels
+cmdLED = threading.Event() # When a command has been received
+
 
 # Package arg tuples for thread
 dwnl_args = (downlink, gnd_bus)
-uplk_args = (downlink, gnd_bus, adcs_cmd, sens_cmd, inputQ, nightMode) # Implement nightMode here
-sens_args = (downlink, i2c_bus, camera, sens_cmd)
+uplk_args = (downlink, gnd_bus, adcs_cmd, inputQ, nightMode, cmdLED) # Implement nightMode here
+sens_args = (downlink, i2c_bus, camera, tempLED)
 adcs_args = (downlink, adcs_cmd, ele, azi, motorInhibit, camera, nightMode)
-serv_args = (downlink, inputQ, nightMode)
+serv_args = (downlink, inputQ, nightMode, tempLED, cmdLED)
 
 # Create thread objects
 threads = [

@@ -1,13 +1,13 @@
 #*********************************************************#
-#   COSGC Presents					                      #
-#      __  __     ___               ____ ____ ____	      #
+#   COSGC Presents                                                            #
+#      __  __     ___               ____ ____ ____            #
 #     / / / /__  / (_)___  _____   /  _//_  //  _/        #
-#    / /_/ / _ \/ / / __ \/ ___/   / / 	 | | / /          #
-#   / __  /  __/ / / /_/ (__  )  _/ /  	 | |/ /           #
-#  /_/ /_/\___/_/_/\____/____/  /___/ 	 |___/	          #
-#   							                          #
-#  Copyright (c) 2014 University of Colorado Boulder	  #
-#  COSGC HASP Helios IV Team				              #
+#    / /_/ / _ \/ / / __ \/ ___/   / /   | | / /          #
+#   / __  /  __/ / / /_/ (__  )  _/ /    | |/ /           #
+#  /_/ /_/\___/_/_/\____/____/  /___/    |___/            #
+#                                                                                 #
+#  Copyright (c) 2014 University of Colorado Boulder      #
+#  COSGC HASP Helios IV Team                                          #
 #*********************************************************#
 
 import threading
@@ -63,41 +63,40 @@ e_bias = 0
 
 try:
     while 1:
-            
-            time.sleep(2./6.)
-            try:
-                    az_reading = daz.read()
-                    ele_reading = delev.read()
-            except:
-                    pass
-            
-                    
-            az_deg = az_reading
-            ele_deg = ele_reading
-                                    
-            total = 0  
-            
-            eleArray.append(ele_deg)			
-            azArray.append(az_deg)
 
-            azArray.pop(0)
-            eleArray.pop(0)
-            
+        time.sleep(2./6.)
+        try:
+            az_reading = daz.read()
+            ele_reading = delev.read()
+        except:
+            pass
 
-            total_ele = sum(eleArray)
-            total_az = sum(azArray)
-            degA =  (total_az / movingAvg) + a_bias
-            degE = (total_ele / movingAvg) + e_bias
-            
-            print("Azimuth: %f\tElevation: %f" %(degA, degE))            
 
-            
-            #Turn based on degrees
-           # azimuth.turnStep(degA, False)
-           # elevation.turnStep(degE, False)
+        az_deg = az_reading
+        ele_deg = ele_reading
+
+        total = 0
+
+        eleArray.append(ele_deg)
+        azArray.append(az_deg)
+
+        azArray.pop(0)
+        eleArray.pop(0)
+
+
+        total_ele = sum(eleArray)
+        total_az = sum(azArray)
+        degA =  (total_az / movingAvg) + a_bias
+        degE = (total_ele / movingAvg) + e_bias
+
+        print("Azimuth: %f\tElevation: %f" %(degA, degE))
+
+
+        #Turn based on degrees
+       # azimuth.turnStep(degA, False)
+       # elevation.turnStep(degE, False)
 
 except(KeyboardInterrupt, SystemExit):
-	#logging.warning("Recieved keyboard interrupt, quitting threads")
-	gpio.cleanup()
-	exit()
-
+    #logging.warning("Recieved keyboard interrupt, quitting threads")
+    gpio.cleanup()
+    exit()

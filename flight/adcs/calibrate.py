@@ -1,14 +1,14 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 
 import threading
@@ -60,7 +60,7 @@ class calibrate:
         """
         img = self.capture()
         if (img == -1): # Added because of weird cv2 error
-                return 0,0,0
+            return 0,0,0
         ret, img = cv2.threshold(img, 250, 255, cv2.THRESH_BINARY)
         img = cv2.blur(img, (5, 5))
         height, width = img.shape

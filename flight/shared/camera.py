@@ -1,14 +1,14 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 
 
@@ -39,7 +39,7 @@ class Camera:
                 cv2.imwrite("/home/pi/hasp_temp/flight_anly/images/keyboard_exit", img)
                 self.close()
         except:
-                return -1
+            return -1
 
     def save(self, file):
         img = self.read()

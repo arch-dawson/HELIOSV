@@ -18,7 +18,7 @@ while(ADCS_cam.isOpened()):
 
     # Our operations on the frame come here
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
+
     # File save location
     file = "/home/pi/hasp_temp/adcs_test/camera_test_images/%i.png" %t
 
@@ -39,13 +39,13 @@ while(ADCS_cam.isOpened()):
     pt4 = (int(x2), int(y2b))
     cv2.line(img, pt1, pt2, (0,255,0),1)
     cv2.line(img, pt3, pt4, (0,255,0),1)
-    
+
     # Save the image
     cv2.imwrite(file,img)
 
     # Display the resulting frame
     cv2.imshow('frame',img)
-    t = t+1 
+    t = t+1
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 

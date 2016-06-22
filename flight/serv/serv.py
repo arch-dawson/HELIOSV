@@ -1,78 +1,136 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 import socket
 import time
 import re
 import subprocess
+import threading
 
-TCP_IP = '192.168.1.234'
-TCP_PORT = 8080
-BUFFER_SIZE = 1024
+msgLock = threading.Lock()
+# Make sure message can only be changed by one thing at a time
 
-def restart():
-	command = "/usr/bin/sudo /sbin/shutdown -r now"
-	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+class Connection():
+    def __init__(self, downlink, inputQ, nightMode, tempLED, cmdLED):
+        # Set up external arguments
+        self.downlink = downlink
+        self.inputQ = inputQ
+        self.nightMode = nightMode
+        self.tempLED = tempLED
+        self.cmdLED = cmdLED
+        self.TCP_IP = '192.168.1.234' # 127.0.0.1 works too, may need to change clnt
+        self.TCP_PORT = 8080
+        self.BUFFER_SIZE = 128
 
-rebootRe=re.compile('reboot', re.IGNORECASE)
+        # Successful bootup
+        self.downlink.put(["SV", "BU", "SERV"])
 
-def connect():
-	global s, conn, addr
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	s.bind((TCP_IP, TCP_PORT))
-	s.listen(1)
-	conn, addr = s.accept()
+        # Night mode default is false
+        self.nightModePrev = False
 
+        # Create server connection
+        self.connect()
+        print("Created Server Connection")
 
-def main(downlink, inputQ, nightMode):
-	connect()
-	nightModePrev = False
+        # Run flight loop
+        self.flight()
 
-	data = conn.recv(BUFFER_SIZE).decode()
-	downlink.put(["BL","RE",data])
+    def checkNight(self): # Check if night mode has changed
+        if self.nightMode.is_set() != self.nightModePrev:
+            self.nightModePrev = self.nightMode.is_set()
+            return True
+        else:
+            return False
 
-	#downlink.put(["BL", "RE", "successful connection to upper pi"])
-	while True:
-		if nightMode.is_set() != nightModePrev:
-			conn.send("night".encode())
-			nightModePrev = nightMode.is_set()
-		cmd=inputQ.get()
-		if cmd == b"\x01":
-			conn.send("reboot".encode())
-		elif cmd == b"\x02":
-			conn.send("ping".encode())
-		elif cmd == b"\x03":
-			conn.send("cpu".encode())
-		elif cmd == b"\x04":
-			conn.send("temp".encode())
-		elif cmd == b"\x05":
-			conn.send("disk".encode())
-		elif cmd == b"\x06":
-			conn.send("faster".encode())
-		elif cmd == b"\x07":
-			conn.send("slower".encode())
-		elif cmd == b"\x08":
-			conn.send("reboot".encode())
-			downlink.put(["BL","BL", "     Rebooting BOTH pi's now"])
-			restart()
-		elif cmd == b"\x09":
-			conn.send("image".encode())
-		else:
-			downlink.put(["BL", "ER", cmd])
+    def checkTemp(self):
+        if self.tempLED.is_set():
+            self.tempLED.clear()
+            return True
+        else:
+            return False
 
+    def checkCmd(self):
+        if self.cmdLED.is_set():
+            self.cmdLED.clear()
+            return True
+        else:
+            return False
 
-		data = conn.recv(BUFFER_SIZE).decode()
-		downlink.put(["BL", "RE", data])
-		if rebootRe.search(data):
-			s.close()
-			connect()
+    def heartBeat(self):
+        with msgLock:
+            self.message += ' night' if self.checkNight() else ''
+            self.message += ' command' if self.checkCmd() else ''
+            self.message += ' fire' if self.checkTemp() else ''
+            self.conn.send(self.message.encode())
+            self.message = "heartbeat"
+
+    def connect(self):
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.s.bind((self.TCP_IP, self.TCP_PORT))
+        self.s.listen(5)
+        self.conn, self.addr = self.s.accept()
+        self.downlink.put(["SV","BU","CLNT"])
+
+    def receive(self):
+        try:
+            data = self.conn.recv(self.BUFFER_SIZE).decode()
+            while data == None:
+                data = self.conn.recv(self.BUFFER_SIZE).decode()
+            self.downlink.put(["SV", "HB", data])
+        except:
+            self.downlink.put(["SV","BL","Connection Lost"])
+            self.connect()
+        return
+
+    def restart(self):
+        command = "/usr/bin/sudo /sbin/shutdown -r now"
+        process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        self.s.close()
+
+    def command(self):
+        cmd = self.inputQ.get()
+        with msgLock:
+            if cmd == b"\x01":
+                self.message += " reboot"
+            elif cmd == b"\x02":
+                self.message += " ping"
+            elif cmd == b"\x03":
+                self.message += " cpu"
+            elif cmd == b"\x04":
+                self.message += " temp"
+            elif cmd == b"\x05":
+                self.message += " disk"
+            elif cmd == b"\x06":
+                self.message += " faster"
+            elif cmd == b"\x07":
+                self.message += " slower"
+            elif cmd == b"\x08":
+                self.message += " reboot"
+                threading.Timer(7.0, self.restart).start()
+            elif cmd == b"\x09":
+                self.message += " image"
+            elif len(cmd) > 0:
+                self.downlink.put(["SV", "BL", "ER"])
+
+    def flight(self):
+        self.downlink.put(["BL","BU","CLNT"])
+        self.message = "heartbeat"
+        while True:
+            time.sleep(5) # Don't remove if you value sanity
+            if not self.inputQ.empty():
+                self.command()
+            self.heartBeat()
+            self.receive()
+
+def main(downlink, inputQ, nightMode, tempLED, cmdLED):
+    connection = Connection(downlink, inputQ, nightMode, tempLED, cmdLED)

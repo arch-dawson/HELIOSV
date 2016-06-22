@@ -1,21 +1,27 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 
 
 import time
 
+# Turns on command LED after a commad has been received, serv will turn it off
+def setcmdLED(cmdLED):
+    if not cmdLED.is_set():
+        cmdLED.set()
+    return
 
-def main(downlink, ground, adcs, sens, inputQ, nightMode):
+
+def main(downlink, ground, adcs, sens, inputQ, nightMode, cmdLED):
     downlink.put(["UP", "BU", "UPLK"])
     while True:
         time.sleep(2)
@@ -28,7 +34,7 @@ def main(downlink, ground, adcs, sens, inputQ, nightMode):
             cr_ = ground.waitByte()
             lf_ = ground.waitByte()
             packet = hex(int.from_bytes((soh + stx + tar + cmd + etx), byteorder='big'))
-            #downlink.put(["soh = ", hex(int.from_bytes(soh, byteorder='big')), "<3"])
+            setcmdLED(cmdLED)
             if soh == b"\x01" and etx == b"\x03":
                 if stx == b"\x02":
                     if tar == b"\xAA":
@@ -50,8 +56,6 @@ def main(downlink, ground, adcs, sens, inputQ, nightMode):
                     elif tar == b"\xD1":
                         nudge = int.from_bytes(cmd, byteorder='big') + 180
                         adcs.put(nudge)
-                    elif tar == b"\xEE":
-                        sens.put(cmd)
                     elif tar == b"\xFF":
                         inputQ.put(cmd)
                     else:

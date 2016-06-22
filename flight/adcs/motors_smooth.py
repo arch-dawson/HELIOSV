@@ -1,14 +1,14 @@
 # *********************************************************#
-#   COSGC Presents										   #
+#   COSGC Presents                                                                                 #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
-#  /_/ /_/_____/_____/___/\____//____/     |___/           #  
+#  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#   													   #
-#  Copyright (c) 2016 University of Colorado Boulder	   #
-#  COSGC HASP Helios V Team							       #
+#                                                                                                          #
+#  Copyright (c) 2016 University of Colorado Boulder       #
+#  COSGC HASP Helios V Team                                                            #
 # *********************************************************#
 
 
@@ -54,7 +54,7 @@ class MotorAZ: # Azimuth motor
         self.k = 1
 
     def setStep(self, deg):
-        
+
         # Setting microsteps based on how far away the camera is from the sun
         # Right now they're all set to 16, but changing this could give coarse and fine movements
         # The larger self.microsteps is, the finer the movement will be
@@ -99,7 +99,7 @@ class MotorAZ: # Azimuth motor
         self.setStep(deg)
         if blocking: # If a nudge command was sent
             # Determine number of steps to take to moved desired number of degrees
-            steps = deg / (aziMaxStep / self.microsteps) 
+            steps = deg / (aziMaxStep / self.microsteps)
             self.wait = .0008
             if abs(self.cnt + steps) > az_steps: # If the nudge would send it over 360 degrees
                 if self.cnt < 0: # If -360 degrees, move +360 degrees to get to zero
@@ -255,7 +255,7 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
         print("Got to reset in motors_smooth")
         drc = False # Direction is UP
         while not self.checkSwitch(drc):
-            gpio.output(self.drc, drc) 
+            gpio.output(self.drc, drc)
             gpio.output(self.stp, True)
             gpio.output(self.stp, False)
             time.sleep(self.wait)
