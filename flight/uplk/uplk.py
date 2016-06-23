@@ -21,7 +21,7 @@ def setcmdLED(cmdLED):
     return
 
 
-def main(downlink, ground, adcs, sens, inputQ, nightMode, cmdLED):
+def main(downlink, ground, adcs, inputQ, nightMode, cmdLED):
     downlink.put(["UP", "BU", "UPLK"])
     while True:
         time.sleep(2)
@@ -34,6 +34,7 @@ def main(downlink, ground, adcs, sens, inputQ, nightMode, cmdLED):
             cr_ = ground.waitByte()
             lf_ = ground.waitByte()
             packet = hex(int.from_bytes((soh + stx + tar + cmd + etx), byteorder='big'))
+            print(packet)
             setcmdLED(cmdLED)
             if soh == b"\x01" and etx == b"\x03":
                 if stx == b"\x02":

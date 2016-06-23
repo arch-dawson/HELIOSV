@@ -16,7 +16,7 @@ import time
 import math
 
 import RPi.GPIO as gpio
-import numpy as npHELIOS Check-In
+import numpy as np
 import threading
 
 reading_tol = 1  # Noise in diode readings, needs to be calculated using diode data
@@ -129,7 +129,7 @@ class MotorAZ: # Azimuth motor
                 self.setStep(aziMaxStep)
                 self.wait = 0.0008
                 self.move(-self.cnt) # Move back to zero
-        else:HELIOS Check-In
+        else:
             time.sleep(diode_wait / 2)
 
     # TurnStep uses this function to actually move the motor
