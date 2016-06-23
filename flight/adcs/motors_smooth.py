@@ -16,7 +16,7 @@ import time
 import math
 
 import RPi.GPIO as gpio
-import numpy as np
+import numpy as npHELIOS Check-In
 import threading
 
 reading_tol = 1  # Noise in diode readings, needs to be calculated using diode data
@@ -29,7 +29,7 @@ aziMaxStep = 1.8 / 4 # 1.8 deg per step, four-to-one gear ratio
 eleMaxStep = 1.8 # 1.8 deg per step, one-to-one gear ratio
 
 az_steps = 12800 # 12800 steps on azimuth is equal to 360 deg
-ele_steps = 528 # 528 steps on elevation is equal to about 70 deg (max height of elevation)
+ele_steps = 710 # 710 steps on elevation is equal to about 80 deg (max height of elevation)
 
 gpio.setwarnings(False)
 gpio.setmode(gpio.BOARD)
@@ -129,7 +129,7 @@ class MotorAZ: # Azimuth motor
                 self.setStep(aziMaxStep)
                 self.wait = 0.0008
                 self.move(-self.cnt) # Move back to zero
-        else:
+        else:HELIOS Check-In
             time.sleep(diode_wait / 2)
 
     # TurnStep uses this function to actually move the motor
@@ -270,6 +270,7 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
             drc = True
             self.cnt += -steps * (16 / self.microsteps)
         else:
+            print("Zero steps...?")
             return
         for i in range(abs(steps)):
             print("Moving the thing, step:", i)
