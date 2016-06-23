@@ -60,6 +60,7 @@ class calibrate:
         """
         img = self.capture()
         if (img == -1): # Added because of weird cv2 error
+            print("Unsuccessful image capture, see cali.analyze")
             return 0,0,0
         ret, img = cv2.threshold(img, 250, 255, cv2.THRESH_BINARY)
         img = cv2.blur(img, (5, 5))
@@ -85,6 +86,7 @@ class calibrate:
                 aziDegDiff = 0
                 eleDegDiff = 0
         else: # If the sun is not in the FOV
+            print("Image taken, no Suns")
             ret = 0
             aziDegDiff = 0
             eleDegDiff = 0

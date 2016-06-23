@@ -219,7 +219,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 if anly:
                     downlink.put(["AD", "AN", "%i, %f, %f" % (ret, degA, degE)])
                 downlink.put(["AD", "DI", "%f, %f" % (degA, degE)])
-                downlink.put(["AD", "MC", "%i %i, %i %i" % (azimuth.cnt, (azimuth.cnt*az_steps/360), elevation.cnt, ((elevation.cnt*ele_steps/80)))-20])
+                downlink.put(["AD", "MC", "%i %i, %i %i" % (azimuth.cnt, (azimuth.cnt*360/az_steps), elevation.cnt, ((elevation.cnt*80/ele_steps)))-20])
                 # The -20 above is to make the printed degree count resemble the physical degree count.  i.e. Zero degrees is flat
                 loop_time = 0
 
@@ -234,5 +234,5 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                     elevation.turnStep(degE, False, anly) # Turn the elevation motor
                 else:
                     time.sleep(.025)
-            if inhib: # If the "Remove Before Flight" pin is activated, don't turn
+            else: # If the "Remove Before Flight" pin is activated, don't turn
                 time.sleep(1. / 15.)

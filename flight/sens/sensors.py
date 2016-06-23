@@ -55,7 +55,7 @@ def cs_str(data):
 
 def capt(camera):
     t = calendar.timegm(time.gmtime())
-    camera.save("/home/pi/hasp_temp/flight_anly/images/%i.png" % t)
+    camera.save("/home/pi/HELIOSV/flight/images/%i.png" % t)
 
 def tempCheck(tempLED, temps):
     # Checks if any temperature readings are outside expected values
@@ -78,6 +78,7 @@ def temp(downlink, tempLED):
             tempLED.set()
         downlink.put(["SE", "T%i" % (len(data)), cs_str(data)])
     except:
+        print("Temperature reading failed")
         pass
 
 
