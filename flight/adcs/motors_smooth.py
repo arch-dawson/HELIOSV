@@ -261,7 +261,7 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
             time.sleep(self.wait)
 
     def move(self, steps):
-        #print(gpio.input(self.rset))
+        print("Getting to ELEmove")
         steps = math.floor(steps)
         if steps < 0: # Up
             drc = False
