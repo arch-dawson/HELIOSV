@@ -40,8 +40,8 @@ ele_steps = 710 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step)
 
 # Without Image Analysis, just use diode readings as degrees
 movingAvg = 8
-a_bias = .75  # Determined experimentally using gnomon
-e_bias = -3.5  # can get more accurate values using image analysis
+a_bias = 0  # Determined experimentally using gnomon
+e_bias = 0  # can get more accurate values using image analysis
 reading_tol = 1  # Noise in diode readings, needs to be  calculated using diode data
 m = 1  # relationship between diode readings and degrees from sun
 deg_tol = .25  # minimum number of degrees to move to consider payload centered

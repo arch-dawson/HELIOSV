@@ -29,8 +29,6 @@ class Camera:
         try:
             with self.lock:
                 ret, src = self.cam.read()
-                if (src.empty()):
-                    return -1
             return cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         except(KeyboardInterrupt, SystemExit):
             with self.lock:

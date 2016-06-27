@@ -23,7 +23,6 @@ gpio.setmode(gpio.BOARD)
 
 def shutdown():
     """ Completes all necessary events for a shutdown """
-    print("Hey, this works!")
     camera.close()
     exit()
 
