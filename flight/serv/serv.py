@@ -119,6 +119,8 @@ class Connection():
                 threading.Timer(7.0, self.restart).start()
             elif cmd == b"\x09":
                 self.message += " image"
+            elif cmd == b"\x0A":
+                self.messase += "exposure"
             elif len(cmd) > 0:
                 self.downlink.put(["SV", "BL", "ER"])
 
