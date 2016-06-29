@@ -59,7 +59,7 @@ class calibrate:
         :return:   None
         """
         img = self.capture()
-        cv2.imshow('Frame', img)
+        #cv2.imshow('Frame', img)
         #if (img == -1): # Added because of weird cv2 error
         #    print("Unsuccessful image capture, see cali.analyze")
         #    return 0,0,0
@@ -87,7 +87,6 @@ class calibrate:
                 aziDegDiff = 0
                 eleDegDiff = 0
         else: # If the sun is not in the FOV
-            print("Image taken, no Suns")
             ret = 0
             aziDegDiff = 0
             eleDegDiff = 0

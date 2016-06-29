@@ -23,8 +23,8 @@ class Bus:
             self.addr = 0x34
         if t is 'e':
             self.addr = 0x14
-        self.main = 0b10100001 # SWAP THESE 
-        self.backup = 0b10100000
+        self.main = 0b10100000 # SWAP THESE 
+        self.backup = 0b10100001
         self.current = 1
         self.cmd = self.main
         self.bus = bus
