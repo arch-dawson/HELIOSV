@@ -34,7 +34,7 @@ def main(downlink, ground, adcs, inputQ, nightMode, cmdLED):
             cr_ = ground.waitByte()
             lf_ = ground.waitByte()
             packet = hex(int.from_bytes((soh + stx + tar + cmd + etx), byteorder='big'))
-            print(packet)
+            #print(packet)
             setcmdLED(cmdLED)
             if soh == b"\x01" and etx == b"\x03":
                 if stx == b"\x02":

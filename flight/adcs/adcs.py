@@ -33,7 +33,7 @@ MS2E = 38
 MS3E = 36
 RSET = 15
 
-# Max steps
+# Max steps 
 az_steps = 12800 # = 360 deg * (4 steps / 1.8 deg) * (16 microsteps / step)
 ele_steps = 710 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step)
 # HELIOS can look 'up' 60 degrees, and 'down' 20 degrees.
@@ -69,6 +69,8 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
     anly_tolerance = 3.5
 
     downlink.put(["AD", "BU", "ADCS"]) # Bootup message
+
+    elevation.resetCount()
 
     while True:  # Flight loop
         while not cmd_queue.empty():  # Command Handling
@@ -146,7 +148,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
 
         if switchHit.is_set():
             downlink.put(["AD", "SW", "HIT"])
-            print("STEVE HAS BEEN TURNED ON")
+            #print("STEVE HAS BEEN TURNED ON")
             # Thank Haleigh for the above
             # Steve is the switch's name
             switchHit.clear()
