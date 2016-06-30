@@ -243,9 +243,20 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
         else:
             time.sleep(diode_wait / 2)
 
+    def panStep(self):
+        # ele_steps = 710
+        # self.cnt = motor count
+        # Resets to ele_steps at switch 
+        step = 10 * (16 / 1.8) # 10 degrees in microsteps
+        if self.cnt - step > 0:
+            self.move(-step)
+        else:
+            self.move(ele_steps - self.cnt)
+        return
+
     def checkSwitch(self, drc): # Return true if switch has been hit
         if gpio.input(self.rset):
-            self.cnt = 710 
+            self.cnt = ele_steps 
             if not self.switchHit.is_set():
                 self.switchHit.set()
         return self.switchHit.is_set() and (drc == False)
@@ -253,11 +264,13 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
 
     def resetCount(self):
         drc = False # Direction is UP
-        while not self.checkSwitch(drc):
+        count = 0
+        while not self.checkSwitch(drc) and count < 710:
             gpio.output(self.drc, drc)
             gpio.output(self.stp, True)
             gpio.output(self.stp, False)
             time.sleep(.1)
+            count += 1
         self.move(-2)
 
     def move(self, steps):
