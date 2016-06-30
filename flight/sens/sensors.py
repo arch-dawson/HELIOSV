@@ -57,7 +57,7 @@ def capt(camera):
     t = calendar.timegm(time.gmtime())
     camera.save("/home/pi/HELIOSV/flight/images/%i.png" % t)
 
-def tempCheck(tempLED, temps):
+def tempCheck(temps):
     # Checks if any temperature readings are outside expected values
     tempBools = [tempI > maxI for tempI,maxI in zip(temps,temp_max)]
     # Returns true if one or more things is on fire. :(
@@ -73,13 +73,12 @@ def temp(downlink, tempLED):
         for i in range(len(data_raw)):
             data.append(data_raw[i])
             #data.append(temp_cal[i] + data_raw[i])
-        if (not tempLED.is_set()) and tempCheck():
+        if (not tempLED.is_set()) and tempCheck(data):
             # If the flag isn't set, and things are on fire.
             tempLED.set()
         downlink.put(["SE", "T%i" % (len(data)), cs_str(data)])
     except:
         print("Temperature reading failed")
-        pass
 
 
 def pres(downlink, bus):

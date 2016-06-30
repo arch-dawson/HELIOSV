@@ -70,7 +70,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
 
     downlink.put(["AD", "BU", "ADCS"]) # Bootup message
 
-    elevation.resetCount()
+    #elevation.resetCount()
 
     while True:  # Flight loop
         while not cmd_queue.empty():  # Command Handling

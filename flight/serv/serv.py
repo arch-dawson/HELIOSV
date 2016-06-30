@@ -27,7 +27,7 @@ class Connection():
         self.nightMode = nightMode
         self.tempLED = tempLED
         self.cmdLED = cmdLED
-        self.TCP_IP = '192.168.1.234' # 127.0.0.1 works too, may need to change clnt
+        self.TCP_IP = '192.168.1.234' # 192.168.1.234 works too, may need to change clnt
         self.TCP_PORT = 8080
         self.BUFFER_SIZE = 128
 
