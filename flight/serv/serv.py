@@ -77,6 +77,7 @@ class Connection():
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.bind((self.TCP_IP, self.TCP_PORT))
+        print("Successfully bound IP")
         self.s.listen(5)
         self.conn, self.addr = self.s.accept()
         self.downlink.put(["SV","BU","CLNT"])

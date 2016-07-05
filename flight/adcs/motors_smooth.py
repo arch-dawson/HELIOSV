@@ -248,10 +248,12 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
         # self.cnt = motor count
         # Resets to ele_steps at switch 
         step = 10 * (16 / 1.8) # 10 degrees in microsteps
-        if self.cnt - step > 0:
-            self.move(-step)
+        if (self.cnt - step) > 0:
+            self.move(step)
+            print("Moving down ", step)
         else:
-            self.move(ele_steps - self.cnt)
+            self.move(-ele_steps)
+            print("Moving back up!")
         return
 
     def checkSwitch(self, drc): # Return true if switch has been hit

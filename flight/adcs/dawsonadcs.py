@@ -1,14 +1,14 @@
 # *********************************************************#
-#   COSGC Presents                                                                                 #
+#   COSGC Presents                                         #
 #      __  __________    ________  _____   __    __        #
 #     / / / / ____/ /   /  _/ __ \/ ___/   | |  / /        #
 #    / /_/ / __/ / /    / // / / /\__ \    | | / /         #
 #   / __  / /___/ /____/ // /_/ /___/ /    | |/ /          #
 #  /_/ /_/_____/_____/___/\____//____/     |___/           #
 #                                                          #
-#                                                                                                          #
+#                                                          #
 #  Copyright (c) 2016 University of Colorado Boulder       #
-#  COSGC HASP Helios V Team                                                            #
+#  COSGC HASP Helios V Team                                #
 # *********************************************************#
 
 
@@ -70,7 +70,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
 
     downlink.put(["AD", "BU", "ADCS"]) # Bootup message
 
-    elevation.resetCount()
+    #elevation.resetCount()
 
     while True:  # Flight loop
         while not cmd_queue.empty():  # Command Handling
@@ -84,17 +84,6 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 # Turn off panning
                 elif cmd == b"\xFB":
                     panning = False
-                    downlink.put(["AD", "AC", packet])
-                # Toggle elevation diodes
-                elif cmd == b"\xA1":
-                    success = False
-                    while not success:
-                        try:
-                            daz.switch()
-                            success = True
-                        except:
-                            pass
-                    time.sleep(1. / 6.)
                     downlink.put(["AD", "AC", packet])
                 # Toggle azimuth diodes
                 elif cmd == b"\xA0":
@@ -175,30 +164,21 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 az_reading = daz.read()
             except:
                 pass
-            try:
-                # Take elevation diode reading
-                ele_reading = delev.read()
-            except:
-                pass
 
             # Moving average filter
 
             # Add new reading to moving average
-            eleArray.append(ele_reading)
             azArray.append(az_reading)
 
             # Remove old reading from moving average
             azArray.pop(0)
-            eleArray.pop(0)
 
             # Find the average
-            total_ele = sum(eleArray)
             total_az = sum(azArray)
             readA = (total_az / movingAvg) + a_bias
-            readE = (total_ele / movingAvg) + e_bias
 
             if run_anly: # If image analysis is turned on
-                if abs(readA) < anly_tolerance and abs(readE) < anly_tolerance: # When the sun should be in the FOV
+                if abs(readA) < anly_tolerance: # When the sun should be in the FOV
                     ret, move_az, move_ele = cali.analyze()
                 else:
                     ret = 0
@@ -212,15 +192,15 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 anly = True
             else:
                 # The sun is not in the FOV, so move off of diode readings
+                elevation.panStep()
                 degA = readA
-                degE = readE
                 anly = False
 
             # Downlink results
             if loop_time >= 1. / 3.:
                 if anly:
                     downlink.put(["AD", "AN", "%i, %f, %f" % (ret, degA, degE)])
-                downlink.put(["AD", "DI", "%f, %f" % (degA, degE)])
+                downlink.put(["AD", "DI", "%f" % degA])
                 downlink.put(["AD", "MC", "%i %i, %i %i" % (azimuth.cnt, (azimuth.cnt*360/az_steps), elevation.cnt, (((elevation.cnt*80/ele_steps)))-20)])
                 # The -20 above is to make the printed degree count resemble the physical degree count.  i.e. Zero degrees is flat
                 loop_time = 0
@@ -230,10 +210,6 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             if not inhib: # If the "Remove Before Flight" pin is not activated
                 if abs(degA) > deg_tol: # If azimuth reading is outside the tolerance
                     azimuth.turnStep(degA, False, anly) # Turn the azimuth motor
-                else:
-                    time.sleep(.025)
-                if abs(degE) > deg_tol: # If elevation reading is outside the tolerance
-                    elevation.turnStep(degE, False, anly) # Turn the elevation motor
                 else:
                     time.sleep(.025)
             else: # If the "Remove Before Flight" pin is activated, don't turn

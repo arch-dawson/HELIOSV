@@ -42,6 +42,7 @@ class Bus:
     def read(self):
         # Read difference from diode pair
         d = self.bus.read(self.addr, 3)
+        print(self.addr, '  ', d)
         data = int.from_bytes(d, byteorder='big', signed=True)
         data = np.int32(data)
         data >>= 6
