@@ -29,7 +29,7 @@ aziMaxStep = 1.8 / 4 # 1.8 deg per step, four-to-one gear ratio
 eleMaxStep = 1.8 # 1.8 deg per step, one-to-one gear ratio
 
 az_steps = 12800 # 12800 steps on azimuth is equal to 360 deg
-ele_steps = 710 # 710 steps on elevation is equal to about 80 deg (max height of elevation)
+ele_steps = 430  # 710 steps on elevation is equal to about 80 deg (max height of elevation)
 
 gpio.setwarnings(False)
 gpio.setmode(gpio.BOARD)
@@ -167,8 +167,8 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
         self.rset = rset
         gpio.setup(rset, gpio.IN)
         self.cnt = 0
-        self.microsteps = 1
-        self.wait = WaitTime
+        self.microsteps = 16   # This line shall forever be doomed to the lowest pit of hell
+        self.wait = diode_wait / self.microsteps
         self.switchHit = switchHit
 
     def setStep(self, deg):
@@ -244,16 +244,16 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
             time.sleep(diode_wait / 2)
 
     def panStep(self):
+        # Have an alternate version of flight code in case the diodes aren't working
+        # This just steps the elevation 10 degrees 
         # ele_steps = 710
         # self.cnt = motor count
         # Resets to ele_steps at switch 
-        step = 10 * (16 / 1.8) # 10 degrees in microsteps
-        if (self.cnt - step) > 0:
-            self.move(step)
-            print("Moving down ", step)
+        turn = math.ceil(self.cnt * (1.8 / 16))
+        if self.cnt: # If motor count is greater than 0
+            self.turnStep(min(3, turn) , True, False)
         else:
-            self.move(-ele_steps)
-            print("Moving back up!")
+            self.turnStep(-ele_steps, True, False)
         return
 
     def checkSwitch(self, drc): # Return true if switch has been hit
@@ -267,31 +267,27 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
     def resetCount(self):
         drc = False # Direction is UP
         count = 0
-        while not self.checkSwitch(drc) and count < 710:
-            gpio.output(self.drc, drc)
-            gpio.output(self.stp, True)
-            gpio.output(self.stp, False)
-            time.sleep(.1)
+        ele_deg = ele_steps * ( 1.8 / 16)
+        while not self.checkSwitch(drc) and count < ele_deg:
+            self.turnStep(-1, True, False) 
             count += 1
-        self.move(-2)
+        self.move(2)
+        return
 
     def move(self, steps):
-        #print("Getting to ELEmove")
         steps = math.floor(steps)
         if steps < 0: # Up
             drc = False
-            self.cnt += -steps * (16 / self.microsteps)
+            self.cnt += -steps * (16 / self.microsteps) 
         elif steps > 0: # Down
             drc = True
             self.cnt += -steps * (16 / self.microsteps)
         else:
-            #print("Zero steps...?")
             return
         for i in range(abs(steps)):
-            #print("Moving the thing, step:", i)
             if self.checkSwitch(drc):
                 break
             gpio.output(self.drc, drc) # Direction
             gpio.output(self.stp, True)
             gpio.output(self.stp, False)
-            time.sleep(self.wait)
+            time.sleep(self.wait) #self.wait
