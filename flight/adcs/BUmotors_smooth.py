@@ -48,16 +48,55 @@ class MotorAZ: # Azimuth motor
         self.ms3 = ms3
         gpio.setup(ms3, gpio.OUT)
         self.cnt = 0
-        self.microsteps = 16
+        self.microsteps = 1
         self.wait = WaitTime
         self.lock = threading.Lock()
         self.k = 1
+
+    def setStep(self, deg):
+
+        # Setting microsteps based on how far away the camera is from the sun
+        # Right now they're all set to 16, but changing this could give coarse and fine movements
+        # The larger self.microsteps is, the finer the movement will be
+        # Check motor driver documentation to know which MS pins to set to True/False to get desired number of microsteps
+        # Can have 1, 2, 4, 8, or 16 microsteps per step
+        if abs(deg) >= 5.85:  # aziMaxStep:
+            ms1 = True
+            ms2 = True
+            ms3 = True
+            self.microsteps = 16
+
+        elif abs(deg) >= 2.025:
+            ms1 = True
+            ms2 = True
+            ms3 = True
+            self.microsteps = 16
+
+        else:
+            ms1 = True
+            ms2 = True
+            ms3 = True
+            self.microsteps = 16
+
+        '''elif abs(deg) >= .75:
+            ms1 = True
+            ms2 = True
+            ms3 = False
+            self.microsteps = 8
+
+        else:
+            ms1 = True
+            ms2 = True
+            ms3 = True
+            self.microsteps = 16'''
+
         gpio.output(self.ms1, ms1)
         gpio.output(self.ms2, ms2)
         gpio.output(self.ms3, ms3)
 
     # Function to turn the motors
     def turnStep(self, deg, blocking, anly):
+        self.setStep(deg)
         if blocking: # If a nudge command was sent
             # Determine number of steps to take to moved desired number of degrees
             steps = deg / (aziMaxStep / self.microsteps)
@@ -87,6 +126,7 @@ class MotorAZ: # Azimuth motor
             if abs(self.cnt) < az_steps: # If it hasn't moved 360 degrees around
                 self.move(steps)
             else: # If it's reached 360 degrees
+                self.setStep(aziMaxStep)
                 self.wait = 0.0008
                 self.move(-self.cnt) # Move back to zero
         else:
@@ -130,11 +170,45 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
         self.microsteps = 16   # This line shall forever be doomed to the lowest pit of hell
         self.wait = diode_wait / self.microsteps
         self.switchHit = switchHit
+
+    def setStep(self, deg):
+        # setting microsteps based on how far away the camera is from the sun
+        if abs(deg) >= 5.85:
+            ms1 = True
+            ms2 = True
+            ms3 = True
+            self.microsteps = 16
+
+        elif abs(deg) >= 2.025:
+            ms1 = True
+            ms2 = True
+            ms3 = True
+            self.microsteps = 16
+
+        else:
+            ms1 = True
+            ms2 = True
+            ms3 = True
+            self.microsteps = 16
+
+        '''elif abs(deg) >= 0.75:
+            ms1 = True
+            ms2 = True
+            ms3 = False
+            self.microsteps = 8
+
+        else:
+            ms1 = True
+            ms2 = True
+            ms3 = True
+            self.microsteps = 16'''''
+
         gpio.output(self.ms1, ms1)
         gpio.output(self.ms2, ms2)
         gpio.output(self.ms3, ms3)
 
     def turnStep(self, deg, blocking, anly):
+        self.setStep(deg)
         if blocking: # If nudge
             steps = deg / (eleMaxStep / self.microsteps)
             self.wait = diode_wait / self.microsteps
@@ -177,7 +251,7 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
         # Resets to ele_steps at switch 
         turn = math.ceil(self.cnt * (1.8 / 16))
         if self.cnt: # If motor count is greater than 0
-            self.turnStep(min(1, turn) , True, False)
+            self.turnStep(min(3, turn) , True, False)
         else:
             self.turnStep(-ele_steps, True, False)
         return

@@ -33,6 +33,10 @@ MS2E = 38
 MS3E = 36
 RSET = 15
 
+# Colin's Piroutte
+# No distinction between being pointed away from the Sun and having the elevation incorrect and facing 180
+# Could run a few iterations of panStep and then Piroutte if still not successful. 
+
 # Max steps 
 az_steps = 12800 # = 360 deg * (4 steps / 1.8 deg) * (16 microsteps / step)
 ele_steps = 430 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step)
@@ -180,6 +184,8 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             if run_anly: # If image analysis is turned on
                 if abs(readA) < anly_tolerance: # When the sun should be in the FOV
                     ret, move_az, move_ele = cali.analyze()
+                    if not ret:
+                        elevation.panStep()
                 else:
                     ret = 0
             else:
@@ -192,7 +198,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 anly = True
             else:
                 # The sun is not in the FOV, so move off of diode readings
-                elevation.panStep()
+                #elevation.panStep()
                 degE = 0
                 degA = readA
                 anly = False
