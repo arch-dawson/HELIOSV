@@ -193,8 +193,8 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
 
             if ret == 1:
                 # The sun is in the FOV, so move off of image analysis
-                degA = move_az
-                degE = move_ele
+                degA = move_az #add/subtract values here
+                degE = move_ele #add/subtract values here
                 anly = True
             else:
                 # The sun is not in the FOV, so move off of diode readings
