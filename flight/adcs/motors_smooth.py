@@ -193,7 +193,7 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
     def resetCount(self):
         drc = False # Direction is UP
         count = 0
-        ele_deg = ele_steps * ( 1.8 / 16)
+        ele_deg = ele_steps * ( 1.8 / 16) * 1.5
         while not self.checkSwitch(drc) and count < ele_deg:
             self.turnStep(-1, True, False) 
             count += 1

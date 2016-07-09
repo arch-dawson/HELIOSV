@@ -184,7 +184,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             if run_anly: # If image analysis is turned on
                 if abs(readA) < anly_tolerance: # When the sun should be in the FOV
                     ret, move_az, move_ele = cali.analyze()
-                    if not ret:
+                    if not ret and not inhib:
                         elevation.panStep()
                 else:
                     ret = 0

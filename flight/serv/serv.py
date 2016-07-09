@@ -121,7 +121,11 @@ class Connection():
             elif cmd == b"\x09":
                 self.message += " image"
             elif cmd == b"\x0A":
-                self.messase += "exposure"
+                self.messase += " exposure"
+            elif cmd == b"\xe0":
+                self.message += " expDown"
+            elif cmd == b"\xe1":
+                self.message += " expUp"
             elif len(cmd) > 0:
                 self.downlink.put(["SV", "BL", "ER"])
 
