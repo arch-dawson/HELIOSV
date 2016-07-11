@@ -14,7 +14,7 @@
 
 import time
 
-# Turns on command LED after a commad has been received, serv will turn it off
+# Turns on command LED after a command has been received, serv will turn it off
 def setcmdLED(cmdLED):
     if not cmdLED.is_set():
         cmdLED.set()

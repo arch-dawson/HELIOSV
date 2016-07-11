@@ -39,7 +39,6 @@ class Connection():
 
         # Create server connection
         self.connect()
-        print("Created Server Connection")
 
         # Run flight loop
         self.flight()
@@ -77,7 +76,6 @@ class Connection():
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.bind((self.TCP_IP, self.TCP_PORT))
-        print("Successfully bound IP")
         self.s.listen(5)
         self.conn, self.addr = self.s.accept()
         self.downlink.put(["SV","BU","CLNT"])
@@ -121,7 +119,7 @@ class Connection():
             elif cmd == b"\x09":
                 self.message += " image"
             elif cmd == b"\x0A":
-                self.messase += " exposure"
+                self.message += " exposure"
             elif cmd == b"\xe0":
                 self.message += " expDown"
             elif cmd == b"\xe1":
