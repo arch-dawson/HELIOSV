@@ -206,7 +206,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             # Downlink results
             if loop_time >= 1. / 3.:
                 if anly:
-                    downlink.put(["AD", "AN", "%i, %f, %f" % (ret, degA, degE)])
+                    downlink.put(["AD", "AN", "%f, %f" % (degA, degE)])
                 downlink.put(["AD", "DI", "%f" % degA])
                 downlink.put(["AD", "MC", "%i %i, %i %i" % (azimuth.cnt, (azimuth.cnt*360/az_steps), elevation.cnt, (((elevation.cnt*80/ele_steps)))-20)])
                 # The -20 above is to make the printed degree count resemble the physical degree count.  i.e. Zero degrees is flat
