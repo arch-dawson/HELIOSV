@@ -103,12 +103,12 @@ class Connection():
                 self.message += " reboot"
             elif cmd == b"\x02":
                 self.message += " ping"
-            elif cmd == b"\x03":
-                self.message += " cpu"
-            elif cmd == b"\x04":
-                self.message += " temp"
-            elif cmd == b"\x05":
-                self.message += " disk"
+#            elif cmd == b"\x03":
+#                self.message += " cpu"
+#            elif cmd == b"\x04":
+#                self.message += " temp"
+#            elif cmd == b"\x05":
+#                self.message += " disk"
             elif cmd == b"\x06":
                 self.message += " faster"
             elif cmd == b"\x07":
