@@ -29,7 +29,7 @@ aziMaxStep = 1.8 / 4 # 1.8 deg per step, four-to-one gear ratio
 eleMaxStep = 1.8 # 1.8 deg per step, one-to-one gear ratio
 
 az_steps = 12800 # 12800 steps on azimuth is equal to 360 deg
-ele_steps = 430  # 710 steps on elevation is equal to about 80 deg (max height of elevation)
+ele_steps = 500  # 710 steps on elevation is equal to about 80 deg (max height of elevation)
 
 gpio.setwarnings(False)
 gpio.setmode(gpio.BOARD)

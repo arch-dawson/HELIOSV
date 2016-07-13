@@ -39,13 +39,13 @@ RSET = 15
 
 # Max steps 
 az_steps = 12800 # = 360 deg * (4 steps / 1.8 deg) * (16 microsteps / step)
-ele_steps = 430 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step)
+ele_steps = 500 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step)
 # HELIOS can look 'up' 60 degrees, and 'down' 20 degrees.
 
 # Without Image Analysis, just use diode readings as degrees
 movingAvg = 8
-a_bias = 0  # Determined experimentally using gnomon
-e_bias = 0  # can get more accurate values using image analysis
+a_bias = .625  # Determined experimentally using gnomon
+# e_bias = 0  # can get more accurate values using image analysis
 reading_tol = 1  # Noise in diode readings, needs to be  calculated using diode data
 m = 1  # relationship between diode readings and degrees from sun
 deg_tol = .25  # minimum number of degrees to move to consider payload centered
@@ -70,7 +70,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
     azArray = [0]
     eleArray = [0]
 
-    anly_tolerance = 3.5
+    anly_tolerance = 2.0 # Changed from 3.5 on 7/13
 
     downlink.put(["AD", "BU", "ADCS"]) # Bootup message
 
