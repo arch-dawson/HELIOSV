@@ -91,6 +91,10 @@ class MotorAZ: # Azimuth motor
                 self.move(-self.cnt) # Move back to zero
         else:
             time.sleep(diode_wait / 2)
+            
+    def colinsPirouette(self): # In honor of Colin Sullivan, who suggested this method
+        self.turnStep(-np.sign(self.cnt)*self.cnt, True, False)
+        return 
 
     # TurnStep uses this function to actually move the motor
     def move(self, steps):

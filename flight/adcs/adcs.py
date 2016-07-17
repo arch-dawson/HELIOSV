@@ -35,7 +35,11 @@ RSET = 15
 
 # Colin's Piroutte
 # No distinction between being pointed away from the Sun and having the elevation incorrect and facing 180
-# Could run a few iterations of panStep and then Piroutte if still not successful. 
+# Will run a few iterations of panStep and then Piroutte if still not successful. 
+pirouetteCounter = 0
+pirouetteThreshold = 30
+pirouetteAZmoved = 0
+pirouetteAZthreshold = 10
 
 # Max steps 
 az_steps = 12800 # = 360 deg * (4 steps / 1.8 deg) * (16 microsteps / step)
@@ -70,7 +74,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
     azArray = [0]
     eleArray = [0]
 
-    anly_tolerance = 2.0 # Changed from 3.5 on 7/13
+    anly_tolerance = 1.5 # Changed from 3.5 on 7/13, 2.0 works well too 
 
     downlink.put(["AD", "BU", "ADCS"]) # Bootup message
     if not inhib:
@@ -184,6 +188,11 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 if abs(readA) < anly_tolerance: # When the sun should be in the FOV
                     ret, move_az, move_ele = cali.analyze()
                     if not ret and not inhib:
+                        pirouetteAZmoved += abs(readA)
+                        pirouetteCounter += 1
+                        if pirouetteCounter > pirouetteThreshold and pirouetteAZmoved > pirouetteAZthreshold:
+                            azimuth.colinsPirouette()
+                            downlink.put(["AD", "CP", ""])
                         elevation.panStep()
                 else:
                     ret = 0
@@ -197,7 +206,8 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 anly = True
             else:
                 # The sun is not in the FOV, so move off of diode readings
-                #elevation.panStep()
+                pirouetteCounter = 0
+                pirouetteAZmoved = 0
                 degE = 0
                 degA = readA
                 anly = False
@@ -214,7 +224,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             # Turn based on degrees
             # The sleep time is necessary to prevent the diodes from trying to sample faster than they are able
             if not inhib: # If the "Remove Before Flight" pin is not activated
-                if abs(degA) > deg_tol: # If azimuth reading is outside the tolerance
+                if abs(degA) > modeg_tol: # If azimuth reading is outside the tolerance
                     azimuth.turnStep(degA, False, anly) # Turn the azimuth motor
                 else:
                     time.sleep(.025)

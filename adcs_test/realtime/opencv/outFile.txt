@@ -1,7 +1,0 @@
-Computation Time Over 50 Runs
-Circle 0	x: 288	y: 260
-Circle 1	x: 474	y: 620
-Circle 2	x: 1014	y: 608
-Circle 3	x: 688	y: 338
-
-1.23 s
