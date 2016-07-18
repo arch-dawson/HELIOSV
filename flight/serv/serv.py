@@ -16,17 +16,21 @@ import re
 import subprocess
 import threading
 
+biasRe = re.compile(r'HB\ ?\-?\d{1,5}\.\d{2}, \-?\d{1,5}\.\d{2}')
+numberRe = re.compile(r'\-?\d{1,5}\.\d{2}')
+
 msgLock = threading.Lock()
 # Make sure message can only be changed by one thing at a time
 
 class Connection():
-    def __init__(self, downlink, inputQ, nightMode, tempLED, cmdLED):
+    def __init__(self, downlink, inputQ, nightMode, tempLED, cmdLED, biasVals):
         # Set up external arguments
         self.downlink = downlink
         self.inputQ = inputQ
         self.nightMode = nightMode
         self.tempLED = tempLED
         self.cmdLED = cmdLED
+        self.biasVals = biasVals
         self.TCP_IP = '192.168.1.234' # 192.168.1.234 works too, may need to change clnt
         self.TCP_PORT = 8080
         self.BUFFER_SIZE = 128
@@ -79,6 +83,13 @@ class Connection():
         self.s.listen(5)
         self.conn, self.addr = self.s.accept()
         self.downlink.put(["SV","BU","CLNT"])
+        return
+        
+    def findBias(self, data):
+        mo = biasRe.search(data)
+        vals = numberRe.findall(mo.group())
+        self.biasVals.put((vals[0], vals[1]))
+        return
 
     def receive(self):
         try:
@@ -103,12 +114,6 @@ class Connection():
                 self.message += " reboot"
             elif cmd == b"\x02":
                 self.message += " ping"
-#            elif cmd == b"\x03":
-#                self.message += " cpu"
-#            elif cmd == b"\x04":
-#                self.message += " temp"
-#            elif cmd == b"\x05":
-#                self.message += " disk"
             elif cmd == b"\x06":
                 self.message += " faster"
             elif cmd == b"\x07":
@@ -137,5 +142,5 @@ class Connection():
             self.heartBeat()
             self.receive()
 
-def main(downlink, inputQ, nightMode, tempLED, cmdLED):
-    connection = Connection(downlink, inputQ, nightMode, tempLED, cmdLED)
+def main(downlink, inputQ, nightMode, tempLED, cmdLED, biasVals):
+    connection = Connection(downlink, inputQ, nightMode, tempLED, cmdLED, biasVals)

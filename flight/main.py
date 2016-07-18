@@ -46,6 +46,8 @@ sens_cmd = queue.Queue()
 downlink = queue.Queue()
 inputQ = queue.Queue()
 
+biasVals = queue.Queue() # Updating biases from science picture analysis
+
 # Create shared photodiode, serial buses, cameras, and default model
 i2c_bus = i2c.I2Cbus()
 ele = diodes.Bus('e', i2c_bus)
@@ -69,8 +71,8 @@ cmdLED = threading.Event() # When a command has been received
 dwnl_args = (downlink, gnd_bus)
 uplk_args = (downlink, gnd_bus, adcs_cmd, inputQ, nightMode, cmdLED) # Implement nightMode here
 sens_args = (downlink, i2c_bus, camera, tempLED)
-adcs_args = (downlink, adcs_cmd, ele, azi, motorInhibit, camera, nightMode)
-serv_args = (downlink, inputQ, nightMode, tempLED, cmdLED)
+adcs_args = (downlink, adcs_cmd, ele, azi, motorInhibit, camera, nightMode, biasVals)
+serv_args = (downlink, inputQ, nightMode, tempLED, cmdLED, biasVals)
 
 # Create thread objects
 threads = [

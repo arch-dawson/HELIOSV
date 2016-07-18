@@ -41,6 +41,11 @@ pirouetteThreshold = 30
 pirouetteAZmoved = 0
 pirouetteAZthreshold = 10
 
+initAzBias = -.6
+initElBias = -1.1
+
+rollingBias = 10
+
 # Max steps 
 az_steps = 12800 # = 360 deg * (4 steps / 1.8 deg) * (16 microsteps / step)
 ele_steps = 500 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step)
@@ -57,7 +62,19 @@ deg_tol = .15 #Changed from .25  # minimum number of degrees to move to consider
 # Setting up threading event for whether the reset switch has been hit
 switchHit = threading.Event()
 
-def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
+def getBias(biasVals, azBiasArray, elBiasArray):
+    azBiasArray.pop()
+    elBiasArray.pop()
+    while not biasVals.empty():
+        biasRaw = biasVals.get()
+    azBiasArray.append(biasRaw(0))
+    elBiasArray.append(biasRaw(1))
+    xBias = sum(azBiasArray)/len(azBiasArray)
+    yBias = sum(elBiasArray)/len(elBiasArray)
+    
+    return (xBias, yBias)         
+
+def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode, biasVals):
     # Set up instances of class
     azimuth = motors_smooth.MotorAZ(STPA, DRCA, MS1A, MS2A, MS3A)
     elevation = motors_smooth.MotorELE(STPE, DRCE, MS1E, MS2E, MS3E, RSET, switchHit)
@@ -68,11 +85,16 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
     panning = False
     loop_time = 0
     run_anly = True
+    
+    azBias = 0
+    elBias = 0
+    azBiasArray = [0] * rollingBias
+    elBiasArray = [0] * rollingBias
 
     az_reading = 0
     ele_reading = 0
-    azArray = [0]
-    eleArray = [0]
+    azArray = [0] * movingAvg
+    eleArray = [0] * movingAvg
 
     anly_tolerance = 1.5 # Changed from 3.5 on 7/13, 2.0 works well too 
 
@@ -202,11 +224,13 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
 
             if ret == 1:
                 # The sun is in the FOV, so move off of image analysis
-                degA = move_az - 0.6  #add/subtract values here
-                degE = move_ele -1.1  #add/subtract values here
+                biases = getBias(biasVals, azBiasArray, elBiasArray)
+                degA = move_az + initAzBias + biases(0) #- 0.6  #add/subtract values here
+                degE = move_ele + initElBias + biases(1)  #- 1.1  #add/subtract values here
                 anly = True
                 pirouetteCounter = 0
                 pirouetteAZmoved = 0
+                
             else:
                 # The sun is not in the FOV, so move off of diode readings
                 degE = 0
