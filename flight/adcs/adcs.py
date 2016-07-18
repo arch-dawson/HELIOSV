@@ -190,7 +190,8 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                     if not ret and not inhib:
                         pirouetteAZmoved += abs(readA)
                         pirouetteCounter += 1
-                        if pirouetteCounter > pirouetteThreshold and pirouetteAZmoved > pirouetteAZthreshold:
+                        # Want lots of resets in a row without much movement on azimuth
+                        if pirouetteCounter > pirouetteThreshold and pirouetteAZmoved < pirouetteAZthreshold:
                             azimuth.colinsPirouette()
                             downlink.put(["AD", "CP", ""])
                         elevation.panStep()
@@ -204,10 +205,10 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
                 degA = move_az - 0.6  #add/subtract values here
                 degE = move_ele -1.1  #add/subtract values here
                 anly = True
-            else:
-                # The sun is not in the FOV, so move off of diode readings
                 pirouetteCounter = 0
                 pirouetteAZmoved = 0
+            else:
+                # The sun is not in the FOV, so move off of diode readings
                 degE = 0
                 degA = readA
                 anly = False
