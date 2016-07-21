@@ -38,11 +38,11 @@ RSET = 15
 # Will run a few iterations of panStep and then Piroutte if still not successful. 
 pirouetteCounter = 0
 pirouetteThreshold = 30
-pirouetteAZmoved = 0
+#pirouetteAZmoved = 0
 pirouetteAZthreshold = 10
 
-initAzBias = -.6
-initElBias = -1.1
+initAzBias = -.2
+initElBias = -1.2
 
 rollingBias = 10
 
@@ -78,6 +78,8 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode, biasVals):
     # Set up instances of class
     azimuth = motors_smooth.MotorAZ(STPA, DRCA, MS1A, MS2A, MS3A)
     elevation = motors_smooth.MotorELE(STPE, DRCE, MS1E, MS2E, MS3E, RSET, switchHit)
+
+    pirouetteAZmoved = 0
 
     cali = calibrate.calibrate(camera)
 
@@ -225,8 +227,8 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode, biasVals):
             if ret == 1:
                 # The sun is in the FOV, so move off of image analysis
                 biases = getBias(biasVals, azBiasArray, elBiasArray)
-                degA = move_az + initAzBias + biases(0) #- 0.6  #add/subtract values here
-                degE = move_ele + initElBias + biases(1)  #- 1.1  #add/subtract values here
+                degA = move_az + initAzBias - biases(0) # Biases are reversed
+                degE = move_ele + initElBias - biases(1)  
                 anly = True
                 pirouetteCounter = 0
                 pirouetteAZmoved = 0
