@@ -23,6 +23,7 @@ def setcmdLED(cmdLED):
 
 def main(downlink, ground, adcs, inputQ, nightMode, cmdLED):
     downlink.put(["UP", "BU", "UPLK"])
+    ground.flushInput() # Added 7/22 to fix all the things
     while True:
         time.sleep(2)
         if ground.inWaiting():

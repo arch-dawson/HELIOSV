@@ -39,7 +39,7 @@ RSET = 15
 
 # Max steps 
 az_steps = 12800 # = 360 deg * (4 steps / 1.8 deg) * (16 microsteps / step)
-ele_steps = 500 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step)
+ele_steps = 600 # = 80 deg * (1 step / 1.8 deg) * (16 microsteps / step)
 # HELIOS can look 'up' 60 degrees, and 'down' 20 degrees.
 
 # Without Image Analysis, just use diode readings as degrees
@@ -48,7 +48,7 @@ a_bias = .625  # Determined experimentally using gnomon
 # e_bias = 0  # can get more accurate values using image analysis
 reading_tol = 1  # Noise in diode readings, needs to be  calculated using diode data
 m = 1  # relationship between diode readings and degrees from sun
-deg_tol = .15 #Changed from .25  # minimum number of degrees to move to consider payload centered
+deg_tol = .25 #Changed from .25  # minimum number of degrees to move to consider payload centered
 
 # Setting up threading event for whether the reset switch has been hit
 switchHit = threading.Event()
@@ -141,9 +141,6 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
 
         if switchHit.is_set():
             downlink.put(["AD", "SW", "HIT"])
-            #print("STEVE HAS BEEN TURNED ON")
-            # Thank Haleigh for the above
-            # Steve is the switch's name
             switchHit.clear()
 
         if panning:
@@ -193,7 +190,7 @@ def main(downlink, cmd_queue, delev, daz, inhib, camera, nightMode):
             if ret == 1:
                 # The sun is in the FOV, so move off of image analysis
                 degA = move_az - 0.2  #add/subtract values here
-                degE = move_ele - 1.1  #-1.1  #add/subtract values here
+                degE = move_ele - 1.2  #-1.1  #add/subtract values here
                 anly = True
             else:
                 # The sun is not in the FOV, so move off of diode readings
