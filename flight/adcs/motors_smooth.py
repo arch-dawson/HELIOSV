@@ -29,7 +29,7 @@ aziMaxStep = 1.8 / 4 # 1.8 deg per step, four-to-one gear ratio
 eleMaxStep = 1.8 # 1.8 deg per step, one-to-one gear ratio
 
 az_steps = 12800 # 12800 steps on azimuth is equal to 360 deg
-ele_steps = 500  # 710 steps on elevation is equal to about 80 deg (max height of elevation)
+ele_steps = 600  # 710 steps on elevation is equal to about 80 deg (max height of elevation)
 
 gpio.setwarnings(False)
 gpio.setmode(gpio.BOARD)
@@ -83,7 +83,7 @@ class MotorAZ: # Azimuth motor
                     self.wait = (diode_wait / abs(steps)) / 4
                 else:
                     self.wait = (diode_wait / abs(steps))
-        if abs(deg) >= .15: #changed 7/21 deg_tol: # If outside the tolerance
+        if abs(deg) >= deg_tol: # If outside the tolerance
             if abs(self.cnt) < az_steps: # If it hasn't moved 360 degrees around
                 self.move(steps)
             else: # If it's reached 360 degrees
@@ -153,7 +153,7 @@ class MotorELE: # Similar to previous class but for elevation motor instead of a
                     self.wait = (diode_wait / abs(steps)) / 4
                 else:
                     self.wait = (diode_wait / abs(steps))
-        if abs(deg) >= .15: # changed 7/21 deg_tol:
+        if abs(deg) >= deg_tol:
             if self.cnt >= 0:
                 if self.cnt < ele_steps:
                     self.move(steps)

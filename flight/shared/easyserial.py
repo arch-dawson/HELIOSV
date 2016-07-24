@@ -49,3 +49,7 @@ class Bus:
     def write(self, data):
         with self.lock:
             self.bus.write(data.encode('utf-8'))
+
+    def flushInput(self):
+        with self.lock:
+            self.bus.flushInput()
